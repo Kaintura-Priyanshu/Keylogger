@@ -302,8 +302,105 @@
             </span>
         `;
         
-        addAlert('info', ' Continuous monitoring started');
+        addAlert('info', '🔄 Continuous monitoring started');
         
         monitoringInterval = setInterval(() => {
             fetch('/api/monitor')
-               
+                .then(response => response.json())
+                .then(data => {
+                    if (data.threats && data.threats.length > 0) {
+                        displayThreats(data.threats);
+                    }
+                });
+        }, 5000);
+    }
+    
+    function stopMonitoring() {
+        if (monitoringInterval) {
+            clearInterval(monitoringInterval);
+            monitoringInterval = null;
+            
+            document.getElementById('monitor-status').innerHTML = `
+                <span class="badge badge-secondary">
+                    <i class="fas fa-pause"></i> Stopped
+                </span>
+            `;
+            
+            addAlert('info', ' Monitoring stopped');
+        }
+    }
+    
+    function displayThreats(threats) {
+        const resultsDiv = document.getElementById('network-results');
+        resultsDiv.innerHTML = threats.map(threat => `
+            <div class="suspicious-process">
+                <div>
+                    <span class="process-name">${threat.process}</span>
+                    <span class="process-pid">PID: ${threat.pid}</span>
+                </div>
+                <div>
+                    <span class="process-reason">${threat.destination}</span>
+                    <span class="threat-level threat-high">HIGH</span>
+                </div>
+            </div>
+        `).join('');
+        
+        threats.forEach(threat => {
+            addAlert('danger', ` Threat detected: ${threat.process} (PID: ${threat.pid})`);
+            addHistoryEntry('Network Threat', threat);
+        });
+    }
+    
+    function addAlert(type, message) {
+        const alertsList = document.getElementById('alerts-list') || 
+                          document.querySelector('.alerts-container');
+        if (!alertsList) return;
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.innerHTML = `
+            <i class="fas fa-${type === 'danger' ? 'exclamation-circle' : 
+                           type === 'warning' ? 'exclamation-triangle' : 
+                           type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            ${message}
+        `;
+        
+        if (alertsList.children.length > 0) {
+            alertsList.prepend(alertDiv);
+        } else {
+            alertsList.appendChild(alertDiv);
+        }
+        
+        // Auto-remove after 30 seconds
+        setTimeout(() => {
+            if (alertDiv.parentElement) {
+                alertDiv.remove();
+            }
+        }, 30000);
+    }
+    
+    function addHistoryEntry(type, data) {
+        const tbody = document.getElementById('history-body');
+        if (tbody.querySelector('.text-muted')) {
+            tbody.innerHTML = '';
+        }
+        
+        const row = document.createElement('tr');
+        const timestamp = new Date().toLocaleString();
+        row.innerHTML = `
+            <td>${timestamp}</td>
+            <td>${type}</td>
+            <td>${data.process || data.name || 'N/A'}</td>
+            <td>${data.pid || 'N/A'}</td>
+            <td><span class="badge badge-danger">Detected</span></td>
+        `;
+        
+        tbody.prepend(row);
+        
+        // Keep only last 50 entries
+        while (tbody.children.length > 50) {
+            tbody.removeChild(tbody.lastChild);
+        }
+    }
+</script>
+{% endblock %}
