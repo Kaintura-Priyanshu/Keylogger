@@ -1,0 +1,230 @@
+/* src/dashboard/static/css/dark-theme.css */
+/* Dark theme overrides and enhancements */
+
+:root {
+    /* Override with dark theme values */
+    --background-primary: #0d1117;
+    --background-secondary: #161b22;
+    --card-bg: #1c2333;
+    --border-color: #30363d;
+    --text-color: #e6edf3;
+    --text-muted: #8b949e;
+    
+    /* Accent colors */
+    --accent-blue: #58a6ff;
+    --accent-green: #3fb950;
+    --accent-orange: #d29922;
+    --accent-red: #f85149;
+    --accent-purple: #bc8cff;
+}
+
+/* Card hover effect */
+.card, .stat-card, .chart-container, .logs-container, .detection-history {
+    transition: all 0.3s ease;
+}
+
+.card:hover, .stat-card:hover {
+    border-color: var(--border-color);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Glowing accents for key elements */
+.nav-brand i {
+    text-shadow: 0 0 20px rgba(244, 67, 54, 0.3);
+}
+
+.status-dot.online {
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+}
+
+/* Code-like key badges */
+.key-badge {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    font-family: 'SF Mono', 'Courier New', monospace;
+    padding: 2px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+/* Table row hover */
+.table tbody tr:hover {
+    background: rgba(88, 166, 255, 0.05);
+}
+
+/* Alert styling */
+.alert {
+    backdrop-filter: blur(10px);
+    background: rgba(22, 27, 34, 0.9);
+}
+
+.alert-info {
+    border-left-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.alert-success {
+    border-left-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.alert-warning {
+    border-left-color: var(--accent-orange);
+    color: var(--accent-orange);
+}
+
+.alert-danger {
+    border-left-color: var(--accent-red);
+    color: var(--accent-red);
+}
+
+/* Chart containers */
+.chart-container canvas {
+    filter: brightness(1.1);
+}
+
+/* Scrollbar for dark theme */
+::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #30363d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+}
+
+/* Selection color */
+::selection {
+    background: rgba(88, 166, 255, 0.3);
+    color: white;
+}
+
+/* Input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select,
+textarea {
+    background: var(--background-secondary);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+/* Button enhancements */
+.btn-primary {
+    background: var(--accent-blue);
+}
+.btn-primary:hover {
+    background: #1f6feb;
+}
+
+.btn-success {
+    background: var(--accent-green);
+}
+.btn-success:hover {
+    background: #2ea043;
+}
+
+.btn-danger {
+    background: var(--accent-red);
+}
+.btn-danger:hover {
+    background: #da3633;
+}
+
+.btn-warning {
+    background: var(--accent-orange);
+}
+.btn-warning:hover {
+    background: #b8871a;
+}
+
+/* Footer */
+.footer {
+    border-top-color: var(--border-color);
+}
+
+.footer-badge {
+    background: var(--background-secondary);
+}
+
+/* Disclaimer page */
+.disclaimer-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.warning-box {
+    background: rgba(210, 153, 34, 0.1);
+}
+
+.legal-list {
+    background: var(--background-secondary);
+}
+
+/* Suspicious process detection */
+.suspicious-process {
+    background: rgba(248, 81, 73, 0.08);
+    border-left-color: var(--accent-red);
+}
+
+.suspicious-process .process-name {
+    color: var(--accent-red);
+}
+
+/* Threat levels */
+.threat-high {
+    background: rgba(248, 81, 73, 0.2);
+    color: var(--accent-red);
+}
+
+.threat-medium {
+    background: rgba(210, 153, 34, 0.2);
+    color: var(--accent-orange);
+}
+
+.threat-low {
+    background: rgba(88, 166, 255, 0.2);
+    color: var(--accent-blue);
+}
+
+/* Dashboard stats */
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.stat-value {
+    color: var(--text-color);
+}
+
+.stat-label {
+    color: var(--text-muted);
+}
+
+/* Report section */
+.report-section {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* Loading spinner */
+.fa-spinner {
+    color: var(--accent-blue);
+}
+
+/* Responsive dark theme adjustments */
+@media (prefers-color-scheme: light) {
+    /* If user prefers light mode, keep dark theme for consistency */
+    /* This ensures the application always uses dark theme */
+}
