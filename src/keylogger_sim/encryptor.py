@@ -1,4 +1,6 @@
-# src/keylogger_sim/encryptor.py
+"""
+AES Encryption Module for Logs
+"""
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -6,7 +8,7 @@ import base64
 import os
 
 class LogEncryptor:
-    def __init__(self, password: str, salt: bytes = None):
+    def __init__(self, password: str = "default_password", salt: bytes = None):
         if salt is None:
             salt = os.urandom(16)
         kdf = PBKDF2HMAC(
