@@ -1,55 +1,24 @@
-<!-- src/dashboard/templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Keylogger Cybersecurity Lab{% endblock %}</title>
-    
-    <!-- Font Awesome Icons -->
+    <title>{% block title %}Keylogger Lab{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-theme.css') }}">
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation -->
     {% include 'components/header.html' %}
     
-    <!-- Main Content -->
     <main class="container">
-        <!-- Flash Messages -->
-        <div id="flash-messages">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible">
-                            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
-                            {{ message }}
-                            <button type="button" class="close-btn" onclick="this.parentElement.remove()">&times;</button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </div>
-        
-        <!-- Page Content -->
         {% block content %}{% endblock %}
     </main>
     
-    <!-- Footer -->
     {% include 'components/footer.html' %}
     
-    <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
