@@ -1,109 +1,83 @@
-<!-- src/dashboard/templates/dashboard.html -->
 {% extends "base.html" %}
 
-{% block title %}📊 Keylogger Dashboard{% endblock %}
+{% block title %}Dashboard - Keylogger Lab{% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <div class="dashboard-title">
-        <h1><i class="fas fa-keyboard"></i> Keystroke Monitor</h1>
-        <p class="text-muted">Real-time keystroke logging simulation (Educational Use Only)</p>
-    </div>
-    <div class="dashboard-controls">
-        <button class="btn btn-success" onclick="refreshLogs()">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+    <h1 style="font-size: 2rem; font-weight: 700; margin: 0;">
+        <i class="fas fa-keyboard" style="color: var(--primary-color);"></i> Keystroke Monitor
+    </h1>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="location.reload()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--success-color); color: white; cursor: pointer; font-weight: 600;">
             <i class="fas fa-sync-alt"></i> Refresh
         </button>
-        <button class="btn btn-danger" onclick="clearLogs()">
+        <button onclick="clearLogs()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--danger-color); color: white; cursor: pointer; font-weight: 600;">
             <i class="fas fa-trash"></i> Clear
+        </button>
+        <button onclick="exportLogs()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--info-color); color: white; cursor: pointer; font-weight: 600;">
+            <i class="fas fa-download"></i> Export
         </button>
     </div>
 </div>
 
-<!-- Statistics Cards -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-keyboard"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Total Keystrokes</div>
-            <div class="stat-value" id="total-keystrokes">0</div>
-        </div>
+<!-- Stats Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Total Keystrokes</div>
+        <div style="font-size: 2rem; font-weight: 700;" id="total-keystrokes">{{ logs|length }}</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-clock"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Active Session</div>
-            <div class="stat-value" id="session-time">00:00:00</div>
-        </div>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Active Session</div>
+        <div style="font-size: 2rem; font-weight: 700;" id="session-time">00:00:00</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Sensitive Keywords</div>
-            <div class="stat-value" id="sensitive-count">0</div>
-        </div>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Sensitive Data</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--danger-color);" id="sensitive-count">0</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Avg. Typing Speed</div>
-            <div class="stat-value" id="typing-speed">0 WPM</div>
-        </div>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Security Score</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);" id="security-score">100%</div>
     </div>
 </div>
 
-<!-- Chart and Logs Grid -->
-<div class="dashboard-grid">
-    <!-- Chart -->
-    <div class="chart-container">
-        <h3><i class="fas fa-chart-bar"></i> Keystroke Activity (Last 10 Minutes)</h3>
-        <canvas id="keystrokeChart"></canvas>
-    </div>
-    
-    <!-- Real-time Alerts -->
-    <div class="alerts-container">
-        <h3><i class="fas fa-bell"></i> Security Alerts</h3>
-        <div id="alerts-list">
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
-                System monitoring active. No threats detected.
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Log Table -->
-<div class="logs-container">
-    <h3><i class="fas fa-list"></i> Recent Keystrokes</h3>
-    <div class="table-responsive">
-        <table class="table" id="logs-table">
+<!-- Logs Table -->
+<div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+    <h3 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Recent Keystrokes</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr>
-                    <th>Timestamp</th>
-                    <th>Key</th>
-                    <th>Window Title</th>
-                    <th>Status</th>
+                    <th style="text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-weight: 600;">Timestamp</th>
+                    <th style="text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-weight: 600;">Key</th>
+                    <th style="text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-weight: 600;">Status</th>
                 </tr>
             </thead>
             <tbody id="logs-body">
                 {% if logs %}
-                    {% for log in logs %}
+                    {% for log in logs|reverse %}
+                        {% set parts = log.split('|') %}
+                        {% set timestamp = parts[0].strip() if parts|length > 0 else '' %}
+                        {% set key = parts[1].strip() if parts|length > 1 else log %}
+                        {% set is_sensitive = 'password' in key.lower() or 'username' in key.lower() or 'email' in key.lower() or 'login' in key.lower() or 'pwd' in key.lower() or 'pass' in key.lower() %}
                         <tr>
-                            <td>{{ log.timestamp if log.timestamp else log[:19] }}</td>
-                            <td>
-                                <span class="key-badge">{{ log.key if log.key else log[21:] }}</span>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">{{ timestamp }}</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
+                                <span style="display: inline-block; padding: 2px 12px; background: var(--background-secondary); border-radius: 4px; font-family: monospace; font-weight: 600; {% if is_sensitive %}border: 1px solid var(--danger-color); color: var(--danger-color);{% endif %}">
+                                    {{ key }}
+                                </span>
                             </td>
-                            <td>{{ log.window if log.window else 'Unknown' }}</td>
-                            <td>
-                                <span class="badge badge-{% if log.sensitive %}danger{% else %}success{% endif %}">
-                                    {{ '⚠️ Sensitive' if log.sensitive else '✅ Normal' }}
+                            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
+                                <span style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; {% if is_sensitive %}background: rgba(248, 81, 73, 0.15); color: var(--danger-color);{% else %}background: rgba(63, 185, 80, 0.15); color: var(--success-color);{% endif %}">
+                                    {% if is_sensitive %}⚠️ Sensitive{% else %}✅ Normal{% endif %}
                                 </span>
                             </td>
                         </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="4" class="text-center text-muted">
-                            <i class="fas fa-inbox"></i> No keystrokes logged yet. Start typing!
+                        <td colspan="3" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                            No keystrokes logged yet. Start typing!
                         </td>
                     </tr>
                 {% endif %}
@@ -112,384 +86,107 @@
     </div>
 </div>
 
-<style>
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .dashboard-title h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-    
-    .dashboard-title h1 i {
-        color: var(--primary-color);
-    }
-    
-    .dashboard-controls {
-        display: flex;
-        gap: 10px;
-    }
-    
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .stat-card {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        border: 1px solid var(--border-color);
-        transition: transform 0.2s;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    .stat-icon {
-        font-size: 2rem;
-        color: var(--primary-color);
-        width: 50px;
-        text-align: center;
-    }
-    
-    .stat-content {
-        flex: 1;
-    }
-    
-    .stat-label {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-weight: 500;
-    }
-    
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--text-color);
-    }
-    
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .chart-container {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .chart-container h3,
-    .alerts-container h3,
-    .logs-container h3 {
-        margin-bottom: 15px;
-        font-size: 1.1rem;
-    }
-    
-    .alerts-container {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    .logs-container {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    .table th {
-        text-align: left;
-        padding: 12px;
-        border-bottom: 2px solid var(--border-color);
-        color: var(--text-muted);
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .table td {
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 0.9rem;
-    }
-    
-    .table tbody tr:hover {
-        background: var(--background-secondary);
-    }
-    
-    .key-badge {
-        display: inline-block;
-        padding: 2px 10px;
-        background: var(--background-secondary);
-        border-radius: 4px;
-        font-family: 'Courier New', monospace;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-    
-    .badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-    
-    .badge-success {
-        background: rgba(76, 175, 80, 0.2);
-        color: var(--success-color);
-    }
-    
-    .badge-danger {
-        background: rgba(244, 67, 54, 0.2);
-        color: var(--danger-color);
-    }
-    
-    .alert {
-        padding: 12px 15px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.9rem;
-    }
-    
-    .alert-info {
-        background: rgba(33, 150, 243, 0.1);
-        border-left: 3px solid var(--info-color);
-        color: var(--info-color);
-    }
-    
-    .alert-warning {
-        background: rgba(255, 152, 0, 0.1);
-        border-left: 3px solid var(--warning-color);
-        color: var(--warning-color);
-    }
-    
-    .alert-danger {
-        background: rgba(244, 67, 54, 0.1);
-        border-left: 3px solid var(--danger-color);
-        color: var(--danger-color);
-    }
-    
-    .text-center {
-        text-align: center;
-    }
-    
-    .text-muted {
-        color: var(--text-muted);
-    }
-    
-    @media (max-width: 768px) {
-        .dashboard-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-        
-        .dashboard-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-    }
-</style>
-
 <script>
-    let keystrokeChart = null;
-    let alertCount = 0;
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeChart();
-        startSessionTimer();
-        
-        // Auto-refresh every 5 seconds
-        setInterval(refreshLogs, 5000);
-    });
-    
-    function initializeChart() {
-        const ctx = document.getElementById('keystrokeChart').getContext('2d');
-        keystrokeChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Array(10).fill('').map((_, i) => `${i+1}m ago`),
-                datasets: [{
-                    label: 'Keystrokes per minute',
-                    data: Array(10).fill(0),
-                    backgroundColor: 'rgba(33, 150, 243, 0.6)',
-                    borderColor: 'rgba(33, 150, 243, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                }
-            }
-        });
+// Session timer
+let seconds = 0;
+setInterval(() => {
+    seconds++;
+    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    const timer = document.getElementById('session-time');
+    if (timer) timer.textContent = `${h}:${m}:${s}`;
+}, 1000);
+
+// Clear logs
+function clearLogs() {
+    if (confirm(' Are you sure you want to clear all logs?')) {
+        fetch('/api/logs/clear', { method: 'POST' })
+            .then(() => location.reload());
     }
-    
-    function refreshLogs() {
-        fetch('/api/logs')
-            .then(response => response.json())
-            .then(data => {
+}
+
+// Export logs
+function exportLogs() {
+    window.location.href = '/api/logs/export';
+}
+
+// Auto-refresh logs
+setInterval(() => {
+    fetch('/api/logs')
+        .then(r => r.json())
+        .then(data => {
+            if (data.logs) {
+                updateLogs(data.logs);
                 updateStats(data.logs);
-                updateTable(data.logs);
-                updateChart(data.logs);
-            })
-            .catch(error => console.error('Error fetching logs:', error));
-    }
-    
-    function updateStats(logs) {
-        if (!logs || logs.length === 0) return;
-        
-        document.getElementById('total-keystrokes').textContent = logs.length;
-        
-        // Count sensitive keywords
-        const sensitive = logs.filter(log => 
-            log.toLowerCase().includes('password') || 
-            log.toLowerCase().includes('username') ||
-            log.toLowerCase().includes('email')
-        );
-        document.getElementById('sensitive-count').textContent = sensitive.length;
-        
-        // Calculate typing speed (approximate)
-        if (logs.length > 10) {
-            const recent = logs.slice(-10);
-            const chars = recent.join('').length;
-            // Rough estimate: 5 chars per word, 1 minute average
-            const wpm = Math.round(chars / 5);
-            document.getElementById('typing-speed').textContent = `${wpm} WPM`;
-        }
-    }
-    
-    function updateTable(logs) {
-        const tbody = document.getElementById('logs-body');
-        if (!logs || logs.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" class="text-center text-muted">
-                        <i class="fas fa-inbox"></i> No keystrokes logged yet.
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-        
-        // Get last 50 logs
-        const recent = logs.slice(-50).reverse();
-        
-        tbody.innerHTML = recent.map(log => {
-            const timestamp = log.split('|')[0]?.trim() || '';
-            const key = log.split('|')[1]?.trim() || log;
-            const isSensitive = /password|username|email|login/i.test(key);
-            
-            return `
-                <tr>
-                    <td>${timestamp}</td>
-                    <td><span class="key-badge">${escapeHtml(key)}</span></td>
-                    <td>Educational Lab</td>
-                    <td>
-                        <span class="badge badge-${isSensitive ? 'danger' : 'success'}">
-                            ${isSensitive ? '⚠️ Sensitive' : '✅ Normal'}
-                        </span>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    }
-    
-    function updateChart(logs) {
-        if (!logs || logs.length === 0 || !keystrokeChart) return;
-        
-        // Count keystrokes per minute (last 10 minutes)
-        const counts = Array(10).fill(0);
-        const now = new Date();
-        
-        logs.forEach(log => {
-            const timestamp = log.split('|')[0]?.trim();
-            if (timestamp) {
-                const logTime = new Date(timestamp);
-                const diffMinutes = Math.floor((now - logTime) / (1000 * 60));
-                if (diffMinutes >= 0 && diffMinutes < 10) {
-                    counts[9 - diffMinutes]++;
-                }
             }
-        });
+        })
+        .catch(console.error);
+}, 5000);
+
+function updateLogs(logs) {
+    const tbody = document.getElementById('logs-body');
+    if (!tbody) return;
+    
+    if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                    No keystrokes logged yet.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    const recent = logs.slice(-50).reverse();
+    tbody.innerHTML = recent.map(log => {
+        const parts = log.split('|');
+        const timestamp = parts[0]?.trim() || '';
+        const key = parts[1]?.trim() || log;
+        const isSensitive = /password|username|email|login|pwd|pass/i.test(key);
         
-        keystrokeChart.data.datasets[0].data = counts;
-        keystrokeChart.update();
-    }
+        return `
+            <tr>
+                <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">${escapeHtml(timestamp)}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
+                    <span style="display: inline-block; padding: 2px 12px; background: var(--background-secondary); border-radius: 4px; font-family: monospace; font-weight: 600; ${isSensitive ? 'border: 1px solid var(--danger-color); color: var(--danger-color);' : ''}">
+                        ${escapeHtml(key)}
+                    </span>
+                </td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
+                    <span style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; ${isSensitive ? 'background: rgba(248, 81, 73, 0.15); color: var(--danger-color);' : 'background: rgba(63, 185, 80, 0.15); color: var(--success-color);'}">
+                        ${isSensitive ? ' Sensitive' : ' Normal'}
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateStats(logs) {
+    const total = document.getElementById('total-keystrokes');
+    if (total) total.textContent = logs.length;
     
-    function startSessionTimer() {
-        let seconds = 0;
-        setInterval(() => {
-            seconds++;
-            const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
-            const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-            const secs = String(seconds % 60).padStart(2, '0');
-            document.getElementById('session-time').textContent = `${hours}:${minutes}:${secs}`;
-        }, 1000);
-    }
+    const sensitive = logs.filter(log => /password|username|email|login|pwd|pass/i.test(log)).length;
+    const sensitiveCount = document.getElementById('sensitive-count');
+    if (sensitiveCount) sensitiveCount.textContent = sensitive;
     
-    function clearLogs() {
-        if (confirm('⚠️ Clear all logged keystrokes?')) {
-            fetch('/api/clear', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    }
-                });
-        }
+    const score = Math.max(0, 100 - (sensitive * 2));
+    const scoreEl = document.getElementById('security-score');
+    if (scoreEl) {
+        scoreEl.textContent = Math.min(100, score) + '%';
+        scoreEl.style.color = score > 70 ? 'var(--success-color)' : score > 40 ? 'var(--warning-color)' : 'var(--danger-color)';
     }
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+console.log(' Dashboard loaded');
 </script>
 {% endblock %}
