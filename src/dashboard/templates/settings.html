@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Settings - Keylogger Lab{% endblock %}
+{% block title %}Settings{% endblock %}
 
 {% block content %}
 <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 30px;">
@@ -8,27 +8,20 @@
 </h1>
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-    <!-- General Settings -->
     <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
         <h3 style="margin-bottom: 15px;"><i class="fas fa-sync-alt"></i> Auto-Refresh</h3>
         <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" checked id="autoRefresh"> Enable Auto-Refresh
+                <input type="checkbox" checked> Enable Auto-Refresh
             </label>
             <span style="font-size: 0.85rem; color: var(--text-muted);">Refresh every 5 seconds</span>
         </div>
-        <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" checked id="notifications"> Enable Notifications
-            </label>
-        </div>
     </div>
     
-    <!-- Theme Settings -->
     <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
         <h3 style="margin-bottom: 15px;"><i class="fas fa-palette"></i> Theme</h3>
         <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            <select id="themeSelect" style="padding: 8px 12px; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color); flex: 1; min-width: 150px;">
+            <select style="padding: 8px 12px; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color);">
                 <option value="dark"> Dark</option>
                 <option value="light"> Light</option>
                 <option value="system"> System Default</option>
@@ -37,140 +30,46 @@
         </div>
     </div>
     
-    <!-- Detection Settings -->
     <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
         <h3 style="margin-bottom: 15px;"><i class="fas fa-shield-alt"></i> Detection</h3>
         <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" id="autoScan"> Auto-Scan
+                <input type="checkbox" checked> Auto-Scan
             </label>
             <span style="font-size: 0.85rem; color: var(--text-muted);">Scan every 30 seconds</span>
         </div>
         <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" id="autoMitigate"> Auto-Mitigate
+                <input type="checkbox"> Auto-Mitigate
             </label>
             <span style="font-size: 0.85rem; color: var(--text-muted);">Automatically terminate threats</span>
         </div>
     </div>
     
-    <!-- Logging Settings -->
     <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
         <h3 style="margin-bottom: 15px;"><i class="fas fa-clipboard-list"></i> Logging</h3>
         <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" checked id="encryptLogs"> Encrypt Logs
-            </label>
-        </div>
-        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" checked id="includeTimestamps"> Include Timestamps
+                <input type="checkbox" checked> Encrypt Logs
             </label>
         </div>
         <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" id="logWindowTitles"> Log Window Titles
+                <input type="checkbox" checked> Include Timestamps
             </label>
         </div>
     </div>
 </div>
 
-<!-- Danger Zone -->
-<div style="margin-top: 30px; padding: 20px; background: rgba(248, 81, 73, 0.05); border-radius: 12px; border: 2px solid var(--danger-color);">
-    <h3 style="color: var(--danger-color); margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+<div style="margin-top: 30px; padding: 20px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color);">
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button onclick="clearAllData()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--danger-color); color: white; cursor: pointer; font-weight: 600;">
-            <i class="fas fa-trash"></i> Clear All Data
+        <button onclick="alert(' Settings saved!')" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--success-color); color: white; cursor: pointer; font-weight: 600;">
+            <i class="fas fa-save"></i> Save Settings
         </button>
-        <button onclick="resetApp()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--danger-color); color: white; cursor: pointer; font-weight: 600;">
-            <i class="fas fa-power-off"></i> Factory Reset
+        <button onclick="alert(' Settings reset!')" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--secondary-color); color: white; cursor: pointer; font-weight: 600;">
+            <i class="fas fa-undo"></i> Reset to Defaults
         </button>
     </div>
 </div>
-
-<!-- Save Button -->
-<div style="margin-top: 20px; padding: 20px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-    <button onclick="saveSettings()" style="padding: 12px 30px; border: none; border-radius: 8px; background: var(--success-color); color: white; cursor: pointer; font-weight: 600; font-size: 1rem;">
-        <i class="fas fa-save"></i> Save Settings
-    </button>
-    <span id="saveStatus" style="margin-left: 15px; color: var(--text-muted);"></span>
-</div>
-
-<script>
-function saveSettings() {
-    const status = document.getElementById('saveStatus');
-    status.textContent = ' Saving...';
-    status.style.color = 'var(--text-muted)';
-    
-    const settings = {
-        autoRefresh: document.getElementById('autoRefresh').checked,
-        notifications: document.getElementById('notifications').checked,
-        theme: document.getElementById('themeSelect').value,
-        autoScan: document.getElementById('autoScan').checked,
-        autoMitigate: document.getElementById('autoMitigate').checked,
-        encryptLogs: document.getElementById('encryptLogs').checked,
-        includeTimestamps: document.getElementById('includeTimestamps').checked,
-        logWindowTitles: document.getElementById('logWindowTitles').checked
-    };
-    
-    // Simulate save
-    setTimeout(() => {
-        status.textContent = ' Settings saved successfully!';
-        status.style.color = 'var(--success-color)';
-        
-        // Apply theme
-        applyTheme(settings.theme);
-        
-        setTimeout(() => {
-            status.textContent = '';
-        }, 3000);
-    }, 1000);
-}
-
-function applyTheme(theme) {
-    if (theme === 'light') {
-        document.documentElement.style.setProperty('--background-primary', '#ffffff');
-        document.documentElement.style.setProperty('--background-secondary', '#f6f8fa');
-        document.documentElement.style.setProperty('--card-bg', '#ffffff');
-        document.documentElement.style.setProperty('--border-color', '#d0d7de');
-        document.documentElement.style.setProperty('--text-color', '#24292f');
-        document.documentElement.style.setProperty('--text-muted', '#57606a');
-    } else {
-        document.documentElement.style.setProperty('--background-primary', '#0d1117');
-        document.documentElement.style.setProperty('--background-secondary', '#161b22');
-        document.documentElement.style.setProperty('--card-bg', '#1c2333');
-        document.documentElement.style.setProperty('--border-color', '#30363d');
-        document.documentElement.style.setProperty('--text-color', '#e6edf3');
-        document.documentElement.style.setProperty('--text-muted', '#8b949e');
-    }
-}
-
-function clearAllData() {
-    if (!confirm(' This will permanently delete all logs and data. Continue?')) return;
-    if (!confirm(' Are you absolutely sure? This action cannot be undone!')) return;
-    
-    fetch('/api/clear-all-data', { method: 'POST' })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alert(' All data cleared successfully!');
-                location.reload();
-            }
-        });
-}
-
-function resetApp() {
-    if (!confirm(' This will reset all settings and data to factory defaults. Continue?')) return;
-    if (!confirm(' Are you absolutely sure? This action cannot be undone!')) return;
-    
-    fetch('/api/reset-application', { method: 'POST' })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alert(' Application reset successfully!');
-                location.reload();
-            }
-        });
-}
-</script>
 {% endblock %}
+   
