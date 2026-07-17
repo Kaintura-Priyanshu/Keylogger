@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Detection - Keylogger Lab{% endblock %}
+{% block title %}Detection{% endblock %}
 
 {% block content %}
 <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 30px;">
@@ -33,7 +33,7 @@
     
     <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); min-height: 300px;">
         <h3 style="margin-bottom: 15px;"><i class="fas fa-bell"></i> Alerts</h3>
-        <div id="alerts-list" style="max-height: 250px; overflow-y: auto;">
+        <div id="alerts-list">
             <div style="padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; background: rgba(33, 150, 243, 0.1); border-left: 3px solid var(--info-color); color: var(--info-color);">
                 <i class="fas fa-info-circle"></i> System monitoring active. No threats detected.
             </div>
@@ -76,9 +76,9 @@ function startScan() {
         .then(data => {
             if (data.threats && data.threats.length > 0) {
                 results.innerHTML = data.threats.map(t => `
-                    <div style="padding: 10px 15px; margin: 5px 0; background: rgba(248, 81, 73, 0.1); border-left: 3px solid var(--danger-color); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;">
+                    <div style="padding: 10px 15px; margin: 5px 0; background: rgba(248, 81, 73, 0.1); border-left: 3px solid var(--danger-color); border-radius: 4px; display: flex; justify-content: space-between;">
                         <span style="font-weight: 600; color: var(--danger-color);">${t.name}</span>
-                        <span style="color: var(--text-muted); font-size: 0.85rem;">PID: ${t.pid}</span>
+                        <span style="color: var(--text-muted);">PID: ${t.pid}</span>
                         <span style="font-size: 0.85rem; color: var(--warning-color);">${t.reason}</span>
                     </div>
                 `).join('');
@@ -92,15 +92,6 @@ function startScan() {
                 `;
                 addAlert('success', ' Scan complete - No threats detected');
             }
-        })
-        .catch(() => {
-            results.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--danger-color);">
-                    <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
-                    <p> Scan failed</p>
-                </div>
-            `;
-            addAlert('danger', ' Scan failed. Check server logs.');
         });
 }
 
@@ -124,7 +115,7 @@ function startMonitoring() {
                     });
                 }
             });
-    }, 10000);
+    }, 5000);
 }
 
 function stopMonitoring() {
@@ -141,7 +132,7 @@ function stopMonitoring() {
 function addAlert(type, message) {
     const container = document.getElementById('alerts-list');
     const alert = document.createElement('div');
-    alert.style.cssText = 'padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; animation: fadeIn 0.3s ease-out;';
+    alert.style.cssText = 'padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;';
     
     if (type === 'danger') {
         alert.style.background = 'rgba(248, 81, 73, 0.1)';
@@ -169,7 +160,7 @@ function addAlert(type, message) {
     
     setTimeout(() => {
         if (alert.parentElement) alert.remove();
-    }, 15000);
+    }, 10000);
 }
 
 function addHistoryEntry(threat) {
@@ -180,18 +171,13 @@ function addHistoryEntry(threat) {
     
     const row = document.createElement('tr');
     row.innerHTML = `
-        <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">${new Date().toLocaleString()}</td>
+        <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">${new Date().toLocaleString()}</td>
         <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">${threat.name || 'Unknown'}</td>
         <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
             <span style="padding: 2px 10px; border-radius: 12px; background: rgba(248, 81, 73, 0.15); color: var(--danger-color); font-size: 0.75rem; font-weight: 600;">Detected</span>
         </td>
     `;
     tbody.prepend(row);
-    
-    // Keep only last 20
-    while (tbody.children.length > 20) {
-        tbody.removeChild(tbody.lastChild);
-    }
 }
 </script>
 {% endblock %}
