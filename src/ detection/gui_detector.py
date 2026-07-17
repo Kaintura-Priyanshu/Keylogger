@@ -9,7 +9,7 @@ from detector import KeyloggerDetector
 class DetectionGUI:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("🔍 Keylogger Detection Tool")
+        self.root.title(" Keylogger Detection Tool")
         self.root.geometry("600x400")
         self.root.configure(bg='#1e1e1e')
         self.detector = KeyloggerDetector()
@@ -35,7 +35,7 @@ class DetectionGUI:
         
     def scan(self):
         self.results.delete(1.0, tk.END)
-        self.results.insert(tk.END, "🔄 Scanning...\n\n")
+        self.results.insert(tk.END, " Scanning...\n\n")
         self.root.update()
         
         suspicious = self.detector.scan_processes()
