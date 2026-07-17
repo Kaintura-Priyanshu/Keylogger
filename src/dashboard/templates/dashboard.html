@@ -1,12 +1,10 @@
-{% extends "base.html" %}
+ {% extends "base.html" %}
 
-{% block title %}Dashboard - Keylogger Lab{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
-    <h1 style="font-size: 2rem; font-weight: 700; margin: 0;">
-        <i class="fas fa-keyboard" style="color: var(--primary-color);"></i> Keystroke Monitor
-    </h1>
+    <h1 style="font-size: 2rem; font-weight: 700; margin: 0;"><i class="fas fa-keyboard" style="color: var(--primary-color);"></i> Keystroke Monitor</h1>
     <div style="display: flex; gap: 10px;">
         <button onclick="location.reload()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--success-color); color: white; cursor: pointer; font-weight: 600;">
             <i class="fas fa-sync-alt"></i> Refresh
@@ -14,14 +12,11 @@
         <button onclick="clearLogs()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--danger-color); color: white; cursor: pointer; font-weight: 600;">
             <i class="fas fa-trash"></i> Clear
         </button>
-        <button onclick="exportLogs()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--info-color); color: white; cursor: pointer; font-weight: 600;">
-            <i class="fas fa-download"></i> Export
-        </button>
     </div>
 </div>
 
-<!-- Stats Cards -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
+<!-- Stats -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
     <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
         <div style="font-size: 0.85rem; color: var(--text-muted);">Total Keystrokes</div>
         <div style="font-size: 2rem; font-weight: 700;" id="total-keystrokes">{{ logs|length }}</div>
@@ -31,12 +26,8 @@
         <div style="font-size: 2rem; font-weight: 700;" id="session-time">00:00:00</div>
     </div>
     <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
-        <div style="font-size: 0.85rem; color: var(--text-muted);">Sensitive Data</div>
-        <div style="font-size: 2rem; font-weight: 700; color: var(--danger-color);" id="sensitive-count">0</div>
-    </div>
-    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
         <div style="font-size: 0.85rem; color: var(--text-muted);">Security Score</div>
-        <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);" id="security-score">100%</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);">100%</div>
     </div>
 </div>
 
@@ -55,21 +46,15 @@
             <tbody id="logs-body">
                 {% if logs %}
                     {% for log in logs|reverse %}
-                        {% set parts = log.split('|') %}
-                        {% set timestamp = parts[0].strip() if parts|length > 0 else '' %}
-                        {% set key = parts[1].strip() if parts|length > 1 else log %}
-                        {% set is_sensitive = 'password' in key.lower() or 'username' in key.lower() or 'email' in key.lower() or 'login' in key.lower() or 'pwd' in key.lower() or 'pass' in key.lower() %}
                         <tr>
-                            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">{{ timestamp }}</td>
+                            <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">{{ log.split('|')[0].strip() if '|' in log else log[:19] }}</td>
                             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
-                                <span style="display: inline-block; padding: 2px 12px; background: var(--background-secondary); border-radius: 4px; font-family: monospace; font-weight: 600; {% if is_sensitive %}border: 1px solid var(--danger-color); color: var(--danger-color);{% endif %}">
-                                    {{ key }}
+                                <span style="display: inline-block; padding: 2px 12px; background: var(--background-secondary); border-radius: 4px; font-family: monospace; font-weight: 600;">
+                                    {{ log.split('|')[1].strip() if '|' in log else log[21:] }}
                                 </span>
                             </td>
                             <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
-                                <span style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; {% if is_sensitive %}background: rgba(248, 81, 73, 0.15); color: var(--danger-color);{% else %}background: rgba(63, 185, 80, 0.15); color: var(--success-color);{% endif %}">
-                                    {% if is_sensitive %}⚠️ Sensitive{% else %}✅ Normal{% endif %}
-                                </span>
+                                <span style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; background: rgba(63, 185, 80, 0.15); color: var(--success-color);">✅ Normal</span>
                             </td>
                         </tr>
                     {% endfor %}
@@ -94,99 +79,18 @@ setInterval(() => {
     const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
     const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
     const s = String(seconds % 60).padStart(2, '0');
-    const timer = document.getElementById('session-time');
-    if (timer) timer.textContent = `${h}:${m}:${s}`;
+    document.getElementById('session-time').textContent = `${h}:${m}:${s}`;
 }, 1000);
 
 // Clear logs
 function clearLogs() {
-    if (confirm(' Are you sure you want to clear all logs?')) {
+    if (confirm(' Clear all logs?')) {
         fetch('/api/logs/clear', { method: 'POST' })
             .then(() => location.reload());
     }
 }
 
-// Export logs
-function exportLogs() {
-    window.location.href = '/api/logs/export';
-}
-
-// Auto-refresh logs
-setInterval(() => {
-    fetch('/api/logs')
-        .then(r => r.json())
-        .then(data => {
-            if (data.logs) {
-                updateLogs(data.logs);
-                updateStats(data.logs);
-            }
-        })
-        .catch(console.error);
-}, 5000);
-
-function updateLogs(logs) {
-    const tbody = document.getElementById('logs-body');
-    if (!tbody) return;
-    
-    if (!logs || logs.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="3" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                    <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
-                    No keystrokes logged yet.
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    const recent = logs.slice(-50).reverse();
-    tbody.innerHTML = recent.map(log => {
-        const parts = log.split('|');
-        const timestamp = parts[0]?.trim() || '';
-        const key = parts[1]?.trim() || log;
-        const isSensitive = /password|username|email|login|pwd|pass/i.test(key);
-        
-        return `
-            <tr>
-                <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">${escapeHtml(timestamp)}</td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
-                    <span style="display: inline-block; padding: 2px 12px; background: var(--background-secondary); border-radius: 4px; font-family: monospace; font-weight: 600; ${isSensitive ? 'border: 1px solid var(--danger-color); color: var(--danger-color);' : ''}">
-                        ${escapeHtml(key)}
-                    </span>
-                </td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
-                    <span style="padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; ${isSensitive ? 'background: rgba(248, 81, 73, 0.15); color: var(--danger-color);' : 'background: rgba(63, 185, 80, 0.15); color: var(--success-color);'}">
-                        ${isSensitive ? ' Sensitive' : ' Normal'}
-                    </span>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
-function updateStats(logs) {
-    const total = document.getElementById('total-keystrokes');
-    if (total) total.textContent = logs.length;
-    
-    const sensitive = logs.filter(log => /password|username|email|login|pwd|pass/i.test(log)).length;
-    const sensitiveCount = document.getElementById('sensitive-count');
-    if (sensitiveCount) sensitiveCount.textContent = sensitive;
-    
-    const score = Math.max(0, 100 - (sensitive * 2));
-    const scoreEl = document.getElementById('security-score');
-    if (scoreEl) {
-        scoreEl.textContent = Math.min(100, score) + '%';
-        scoreEl.style.color = score > 70 ? 'var(--success-color)' : score > 40 ? 'var(--warning-color)' : 'var(--danger-color)';
-    }
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-console.log(' Dashboard loaded');
+// Update total keystrokes
+document.getElementById('total-keystrokes').textContent = {{ logs|length }};
 </script>
 {% endblock %}
