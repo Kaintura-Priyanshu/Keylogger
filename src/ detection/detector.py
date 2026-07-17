@@ -33,9 +33,9 @@ class KeyloggerDetector:
     def generate_report(self):
         """Generate detection report"""
         if not self.detected:
-            return "✅ No suspicious processes detected"
+            return " No suspicious processes detected"
         
-        report = "⚠️ SUSPICIOUS PROCESSES FOUND:\n"
+        report = " SUSPICIOUS PROCESSES FOUND:\n"
         report += "=" * 40 + "\n"
         for proc in self.detected:
             report += f"PID: {proc['pid']} | Name: {proc['name']} | {proc['reason']}\n"
