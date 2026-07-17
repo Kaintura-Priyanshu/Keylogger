@@ -1,62 +1,47 @@
-# src/detection/detector.py
+#!/usr/bin/env python3
+"""
+Keylogger Detection Module
+"""
 import psutil
 import os
-import re
 
 class KeyloggerDetector:
-    # Known keylogging process names/patterns
-    SUSPICIOUS_NAMES = [
-        'keylog', 'spy', 'monitor', 'capture', 
-        'logger', 'record', 'stealth'
-    ]
-    
-    # Keylogging API patterns
-    SUSPICIOUS_API_CALLS = [
-        'GetAsyncKeyState',      # Polling [citation:6]
-        'SetWindowsHookEx',      # Keyboard hooking [citation:6]
-        'GetKeyState',           # Keystate polling
-        'WH_KEYBOARD_LL',        # Low-level hook
-        'RegisterRawInputDevices' # Raw input capture
-    ]
+    SUSPICIOUS_NAMES = ['keylog', 'spy', 'monitor', 'capture', 'logger', 'record']
+    SUSPICIOUS_API = ['GetAsyncKeyState', 'SetWindowsHookEx', 'GetKeyState']
     
     def __init__(self):
-        self.detected_processes = []
+        self.detected = []
         
     def scan_processes(self):
-        """Scan all running processes for suspicious indicators"""
-        suspicious = []
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        """Scan running processes"""
+        self.detected = []
+        for proc in psutil.process_iter(['pid', 'name']):
             try:
-                proc_info = proc.info
-                proc_name = proc_info['name'].lower()
-                
-                # Check process name
+                name = proc.info['name'].lower()
                 for pattern in self.SUSPICIOUS_NAMES:
-                    if pattern in proc_name:
-                        suspicious.append({
-                            'pid': proc_info['pid'],
-                            'name': proc_info['name'],
-                            'reason': f'Name contains "{pattern}"'
+                    if pattern in name:
+                        self.detected.append({
+                            'pid': proc.info['pid'],
+                            'name': proc.info['name'],
+                            'reason': f'Contains "{pattern}"'
                         })
                         break
-                        
-                # Check loaded DLLs for keylogging APIs
-                # (Advanced: scan memory for API hook patterns)
-                
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 continue
-                
-        self.detected_processes = suspicious
-        return suspicious
+        return self.detected
         
-    def generate_alert(self):
-        """Generate detection alert"""
-        if not self.detected_processes:
+    def generate_report(self):
+        """Generate detection report"""
+        if not self.detected:
             return "✅ No suspicious processes detected"
-            
-        alert = "⚠️ KEYLOGGER DETECTED!\n"
-        alert += "=" * 50 + "\n"
-        for proc in self.detected_processes:
-            alert += f"PID: {proc['pid']} | Process: {proc['name']}\n"
-            alert += f"Reason: {proc['reason']}\n\n"
-        return alert
+        
+        report = "⚠️ SUSPICIOUS PROCESSES FOUND:\n"
+        report += "=" * 40 + "\n"
+        for proc in self.detected:
+            report += f"PID: {proc['pid']} | Name: {proc['name']} | {proc['reason']}\n"
+        return report
+
+if __name__ == "__main__":
+    detector = KeyloggerDetector()
+    detector.scan_processes()
+    print(detector.generate_report())
