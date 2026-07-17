@@ -1,75 +1,62 @@
-<!-- src/dashboard/templates/detection.html -->
 {% extends "base.html" %}
 
-{% block title %} Keylogger Detection{% endblock %}
+{% block title %}Detection - Keylogger Lab{% endblock %}
 
 {% block content %}
-<div class="detection-header">
-    <h1><i class="fas fa-shield-alt"></i> Keylogger Detection Engine</h1>
-    <p class="text-muted">Real-time monitoring and threat detection</p>
-</div>
+<h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 30px;">
+    <i class="fas fa-shield-alt" style="color: var(--warning-color);"></i> Keylogger Detection
+</h1>
 
-<!-- Detection Controls -->
-<div class="detection-controls">
-    <button class="btn btn-primary" onclick="startScan()">
+<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px;">
+    <button onclick="startScan()" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-color); color: white; cursor: pointer; font-weight: 600;">
         <i class="fas fa-search"></i> Full System Scan
     </button>
-    <button class="btn btn-success" onclick="startMonitoring()">
-        <i class="fas fa-play"></i> Continuous Monitoring
+    <button onclick="startMonitoring()" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--success-color); color: white; cursor: pointer; font-weight: 600;">
+        <i class="fas fa-play"></i> Start Monitoring
     </button>
-    <button class="btn btn-danger" onclick="stopMonitoring()">
+    <button onclick="stopMonitoring()" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--danger-color); color: white; cursor: pointer; font-weight: 600;">
         <i class="fas fa-stop"></i> Stop Monitoring
     </button>
-    <div class="status-badge" id="monitor-status">
-        <span class="badge badge-secondary">
-            <i class="fas fa-pause"></i> Stopped
-        </span>
-    </div>
+    <span id="monitor-status" style="padding: 10px 20px; border-radius: 8px; background: var(--background-secondary); color: var(--text-muted);">
+        <i class="fas fa-pause"></i> Stopped
+    </span>
 </div>
 
-<!-- Detection Results -->
-<div class="detection-grid">
-    <!-- Process Scan Results -->
-    <div class="scan-results">
-        <h3><i class="fas fa-microchip"></i> Process Scan</h3>
-        <div id="process-scan-results">
-            <div class="scan-placeholder">
-                <i class="fas fa-search"></i>
-                <p>Click "Full System Scan" to start</p>
-            </div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); min-height: 300px;">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-microchip"></i> Process Scan</h3>
+        <div id="scan-results" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--text-muted);">
+            <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+            <p>Click "Full System Scan" to start</p>
         </div>
     </div>
     
-    <!-- Network Monitoring -->
-    <div class="network-monitor">
-        <h3><i class="fas fa-network-wired"></i> Network Connections</h3>
-        <div id="network-results">
-            <div class="scan-placeholder">
-                <i class="fas fa-network-wired"></i>
-                <p>No suspicious connections detected</p>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); min-height: 300px;">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-bell"></i> Alerts</h3>
+        <div id="alerts-list" style="max-height: 250px; overflow-y: auto;">
+            <div style="padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; background: rgba(33, 150, 243, 0.1); border-left: 3px solid var(--info-color); color: var(--info-color);">
+                <i class="fas fa-info-circle"></i> System monitoring active. No threats detected.
             </div>
         </div>
     </div>
 </div>
 
-<!-- Detection History -->
-<div class="detection-history">
-    <h3><i class="fas fa-history"></i> Detection History</h3>
-    <div class="table-responsive">
-        <table class="table">
+<div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+    <h3 style="margin-bottom: 15px;"><i class="fas fa-history"></i> Detection History</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr>
-                    <th>Timestamp</th>
-                    <th>Alert Type</th>
-                    <th>Process</th>
-                    <th>PID</th>
-                    <th>Status</th>
+                    <th style="text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted);">Timestamp</th>
+                    <th style="text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted);">Alert</th>
+                    <th style="text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted);">Status</th>
                 </tr>
             </thead>
             <tbody id="history-body">
                 <tr>
-                    <td colspan="5" class="text-center text-muted">
-                        <i class="fas fa-inbox"></i> No detection history
+                    <td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                        <i class="fas fa-inbox" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                        No detection history
                     </td>
                 </tr>
             </tbody>
@@ -77,330 +64,134 @@
     </div>
 </div>
 
-<style>
-    .detection-header {
-        margin-bottom: 30px;
-    }
-    
-    .detection-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-    }
-    
-    .detection-header h1 i {
-        color: var(--warning-color);
-    }
-    
-    .detection-controls {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        padding: 20px;
-        background: var(--card-bg);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        margin-bottom: 30px;
-    }
-    
-    .status-badge {
-        margin-left: auto;
-    }
-    
-    .badge {
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-    
-    .badge-secondary {
-        background: var(--background-secondary);
-        color: var(--text-muted);
-    }
-    
-    .badge-success {
-        background: rgba(76, 175, 80, 0.2);
-        color: var(--success-color);
-    }
-    
-    .badge-danger {
-        background: rgba(244, 67, 54, 0.2);
-        color: var(--danger-color);
-    }
-    
-    .detection-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .scan-results,
-    .network-monitor {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-        min-height: 300px;
-    }
-    
-    .scan-results h3,
-    .network-monitor h3,
-    .detection-history h3 {
-        margin-bottom: 15px;
-        font-size: 1.1rem;
-    }
-    
-    .scan-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 200px;
-        color: var(--text-muted);
-    }
-    
-    .scan-placeholder i {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        opacity: 0.5;
-    }
-    
-    .detection-history {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .suspicious-process {
-        padding: 10px 15px;
-        margin: 5px 0;
-        background: rgba(244, 67, 54, 0.1);
-        border-left: 3px solid var(--danger-color);
-        border-radius: 4px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .suspicious-process .process-name {
-        font-weight: 600;
-        color: var(--danger-color);
-    }
-    
-    .suspicious-process .process-pid {
-        font-family: 'Courier New', monospace;
-        color: var(--text-muted);
-        font-size: 0.85rem;
-    }
-    
-    .suspicious-process .process-reason {
-        font-size: 0.85rem;
-        color: var(--warning-color);
-    }
-    
-    .threat-level {
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-    
-    .threat-high {
-        background: rgba(244, 67, 54, 0.2);
-        color: var(--danger-color);
-    }
-    
-    .threat-medium {
-        background: rgba(255, 152, 0, 0.2);
-        color: var(--warning-color);
-    }
-    
-    .threat-low {
-        background: rgba(33, 150, 243, 0.2);
-        color: var(--info-color);
-    }
-    
-    @media (max-width: 768px) {
-        .detection-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .detection-controls {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .status-badge {
-            margin-left: 0;
-            text-align: center;
-        }
-    }
-</style>
-
 <script>
-    let monitoringInterval = null;
+let monitoringInterval = null;
+
+function startScan() {
+    const results = document.getElementById('scan-results');
+    results.innerHTML = '<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px;"><i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 15px;"></i><p>Scanning...</p></div>';
     
-    function startScan() {
-        const resultsDiv = document.getElementById('process-scan-results');
-        resultsDiv.innerHTML = '<div class="scan-placeholder"><i class="fas fa-spinner fa-spin"></i><p>Scanning...</p></div>';
-        
-        fetch('/api/scan', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                displayScanResults(data);
-                addHistoryEntry('Manual Scan', data);
-            })
-            .catch(error => {
-                resultsDiv.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-times-circle"></i> Scan failed: ${error}
+    fetch('/api/scan', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.threats && data.threats.length > 0) {
+                results.innerHTML = data.threats.map(t => `
+                    <div style="padding: 10px 15px; margin: 5px 0; background: rgba(248, 81, 73, 0.1); border-left: 3px solid var(--danger-color); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;">
+                        <span style="font-weight: 600; color: var(--danger-color);">${t.name}</span>
+                        <span style="color: var(--text-muted); font-size: 0.85rem;">PID: ${t.pid}</span>
+                        <span style="font-size: 0.85rem; color: var(--warning-color);">${t.reason}</span>
+                    </div>
+                `).join('');
+                addAlert('warning', ` ${data.threats.length} suspicious process(es) detected!`);
+            } else {
+                results.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--success-color);">
+                        <i class="fas fa-check-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p> No threats detected</p>
                     </div>
                 `;
-            });
-    }
-    
-    function displayScanResults(data) {
-        const resultsDiv = document.getElementById('process-scan-results');
-        
-        if (data.suspicious && data.suspicious.length > 0) {
-            resultsDiv.innerHTML = data.suspicious.map(proc => `
-                <div class="suspicious-process">
-                    <div>
-                        <span class="process-name">${proc.name}</span>
-                        <span class="process-pid">PID: ${proc.pid}</span>
-                    </div>
-                    <div>
-                        <span class="process-reason">${proc.reason}</span>
-                        <span class="threat-level threat-${proc.threat || 'medium'}">${proc.threat || 'MEDIUM'}</span>
-                    </div>
-                </div>
-            `).join('');
-            
-            // Add alert
-            addAlert('warning', ` ${data.suspicious.length} suspicious process(es) detected!`);
-        } else {
-            resultsDiv.innerHTML = `
-                <div class="scan-placeholder">
-                    <i class="fas fa-check-circle" style="color: var(--success-color); opacity: 1;"></i>
-                    <p style="color: var(--success-color);"> No suspicious processes found</p>
-                </div>
-            `;
-            addAlert('success', ' System scan completed - No threats detected');
-        }
-    }
-    
-    function startMonitoring() {
-        if (monitoringInterval) return;
-        
-        document.getElementById('monitor-status').innerHTML = `
-            <span class="badge badge-success">
-                <i class="fas fa-play"></i> Monitoring
-            </span>
-        `;
-        
-        addAlert('info', '🔄 Continuous monitoring started');
-        
-        monitoringInterval = setInterval(() => {
-            fetch('/api/monitor')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.threats && data.threats.length > 0) {
-                        displayThreats(data.threats);
-                    }
-                });
-        }, 5000);
-    }
-    
-    function stopMonitoring() {
-        if (monitoringInterval) {
-            clearInterval(monitoringInterval);
-            monitoringInterval = null;
-            
-            document.getElementById('monitor-status').innerHTML = `
-                <span class="badge badge-secondary">
-                    <i class="fas fa-pause"></i> Stopped
-                </span>
-            `;
-            
-            addAlert('info', ' Monitoring stopped');
-        }
-    }
-    
-    function displayThreats(threats) {
-        const resultsDiv = document.getElementById('network-results');
-        resultsDiv.innerHTML = threats.map(threat => `
-            <div class="suspicious-process">
-                <div>
-                    <span class="process-name">${threat.process}</span>
-                    <span class="process-pid">PID: ${threat.pid}</span>
-                </div>
-                <div>
-                    <span class="process-reason">${threat.destination}</span>
-                    <span class="threat-level threat-high">HIGH</span>
-                </div>
-            </div>
-        `).join('');
-        
-        threats.forEach(threat => {
-            addAlert('danger', ` Threat detected: ${threat.process} (PID: ${threat.pid})`);
-            addHistoryEntry('Network Threat', threat);
-        });
-    }
-    
-    function addAlert(type, message) {
-        const alertsList = document.getElementById('alerts-list') || 
-                          document.querySelector('.alerts-container');
-        if (!alertsList) return;
-        
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type}`;
-        alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'danger' ? 'exclamation-circle' : 
-                           type === 'warning' ? 'exclamation-triangle' : 
-                           type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-            ${message}
-        `;
-        
-        if (alertsList.children.length > 0) {
-            alertsList.prepend(alertDiv);
-        } else {
-            alertsList.appendChild(alertDiv);
-        }
-        
-        // Auto-remove after 30 seconds
-        setTimeout(() => {
-            if (alertDiv.parentElement) {
-                alertDiv.remove();
+                addAlert('success', ' Scan complete - No threats detected');
             }
-        }, 30000);
+        })
+        .catch(() => {
+            results.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--danger-color);">
+                    <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <p> Scan failed</p>
+                </div>
+            `;
+            addAlert('danger', ' Scan failed. Check server logs.');
+        });
+}
+
+function startMonitoring() {
+    if (monitoringInterval) return;
+    
+    document.getElementById('monitor-status').innerHTML = `
+        <span style="color: var(--success-color);"><i class="fas fa-play"></i> Monitoring</span>
+    `;
+    
+    addAlert('info', ' Continuous monitoring started');
+    
+    monitoringInterval = setInterval(() => {
+        fetch('/api/monitor')
+            .then(r => r.json())
+            .then(data => {
+                if (data.threats && data.threats.length > 0) {
+                    data.threats.forEach(t => {
+                        addAlert('danger', ` Threat: ${t.name} (PID: ${t.pid})`);
+                        addHistoryEntry(t);
+                    });
+                }
+            });
+    }, 10000);
+}
+
+function stopMonitoring() {
+    if (monitoringInterval) {
+        clearInterval(monitoringInterval);
+        monitoringInterval = null;
+        document.getElementById('monitor-status').innerHTML = `
+            <span style="color: var(--text-muted);"><i class="fas fa-pause"></i> Stopped</span>
+        `;
+        addAlert('info', ' Monitoring stopped');
+    }
+}
+
+function addAlert(type, message) {
+    const container = document.getElementById('alerts-list');
+    const alert = document.createElement('div');
+    alert.style.cssText = 'padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; animation: fadeIn 0.3s ease-out;';
+    
+    if (type === 'danger') {
+        alert.style.background = 'rgba(248, 81, 73, 0.1)';
+        alert.style.borderLeft = '3px solid var(--danger-color)';
+        alert.style.color = 'var(--danger-color)';
+        alert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+    } else if (type === 'warning') {
+        alert.style.background = 'rgba(255, 152, 0, 0.1)';
+        alert.style.borderLeft = '3px solid var(--warning-color)';
+        alert.style.color = 'var(--warning-color)';
+        alert.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+    } else if (type === 'success') {
+        alert.style.background = 'rgba(63, 185, 80, 0.1)';
+        alert.style.borderLeft = '3px solid var(--success-color)';
+        alert.style.color = 'var(--success-color)';
+        alert.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+    } else {
+        alert.style.background = 'rgba(33, 150, 243, 0.1)';
+        alert.style.borderLeft = '3px solid var(--info-color)';
+        alert.style.color = 'var(--info-color)';
+        alert.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
     }
     
-    function addHistoryEntry(type, data) {
-        const tbody = document.getElementById('history-body');
-        if (tbody.querySelector('.text-muted')) {
-            tbody.innerHTML = '';
-        }
-        
-        const row = document.createElement('tr');
-        const timestamp = new Date().toLocaleString();
-        row.innerHTML = `
-            <td>${timestamp}</td>
-            <td>${type}</td>
-            <td>${data.process || data.name || 'N/A'}</td>
-            <td>${data.pid || 'N/A'}</td>
-            <td><span class="badge badge-danger">Detected</span></td>
-        `;
-        
-        tbody.prepend(row);
-        
-        // Keep only last 50 entries
-        while (tbody.children.length > 50) {
-            tbody.removeChild(tbody.lastChild);
-        }
+    container.prepend(alert);
+    
+    setTimeout(() => {
+        if (alert.parentElement) alert.remove();
+    }, 15000);
+}
+
+function addHistoryEntry(threat) {
+    const tbody = document.getElementById('history-body');
+    if (tbody.querySelector('.text-muted')) {
+        tbody.innerHTML = '';
     }
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">${new Date().toLocaleString()}</td>
+        <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">${threat.name || 'Unknown'}</td>
+        <td style="padding: 10px 12px; border-bottom: 1px solid var(--border-color);">
+            <span style="padding: 2px 10px; border-radius: 12px; background: rgba(248, 81, 73, 0.15); color: var(--danger-color); font-size: 0.75rem; font-weight: 600;">Detected</span>
+        </td>
+    `;
+    tbody.prepend(row);
+    
+    // Keep only last 20
+    while (tbody.children.length > 20) {
+        tbody.removeChild(tbody.lastChild);
+    }
+}
 </script>
 {% endblock %}
