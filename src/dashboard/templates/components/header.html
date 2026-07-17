@@ -1,47 +1,23 @@
-<!-- src/dashboard/templates/components/header.html -->
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="nav-brand">
-            <a href="{{ url_for('dashboard') }}">
-                <i class="fas fa-shield-virus"></i>
-                <span>Keylogger<span class="text-accent">Lab</span></span>
-            </a>
-        </div>
+<nav style="background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 0 2rem; position: sticky; top: 0; z-index: 1000;">
+    <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; height: 70px;">
+        <a href="{{ url_for('index') }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; font-size: 1.5rem; font-weight: 800; color: var(--text-color);">
+            <i class="fas fa-shield-virus" style="color: var(--danger-color); font-size: 1.8rem;"></i>
+            <span>Keylogger<span style="color: var(--primary-color);">Lab</span></span>
+        </a>
         
-        <button class="nav-toggle" onclick="toggleNav()">
+        <button onclick="document.getElementById('navMenu').classList.toggle('active')" style="display: none; background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer;">
             <i class="fas fa-bars"></i>
         </button>
         
-        <ul class="nav-menu" id="nav-menu">
-            <li class="nav-item">
-                <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
-                    <i class="fas fa-keyboard"></i> Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url_for('detection') }}" class="nav-link {% if request.endpoint == 'detection' %}active{% endif %}">
-                    <i class="fas fa-shield-alt"></i> Detection
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url_for('analytics') }}" class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}">
-                    <i class="fas fa-chart-pie"></i> Analytics
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url_for('settings') }}" class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}">
-                    <i class="fas fa-cog"></i> Settings
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">
-                    <i class="fas fa-info-circle"></i> About
-                </a>
-            </li>
-            <li class="nav-item">
-                <span class="nav-status">
-                    <span class="status-dot online"></span>
-                    <span class="status-text">System Online</span>
+        <ul id="navMenu" style="display: flex; list-style: none; gap: 5px; margin: 0; padding: 0; align-items: center;">
+            <li><a href="{{ url_for('dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-muted); font-weight: 500;"><i class="fas fa-keyboard"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('detection') }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-muted); font-weight: 500;"><i class="fas fa-shield-alt"></i> Detection</a></li>
+            <li><a href="{{ url_for('analytics') }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-muted); font-weight: 500;"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+            <li><a href="{{ url_for('settings') }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; text-decoration: none; color: var(--text-muted); font-weight: 500;"><i class="fas fa-cog"></i> Settings</a></li>
+            <li>
+                <span style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--background-secondary); border-radius: 20px; font-size: 0.85rem; color: var(--text-muted); margin-left: 10px;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); animation: pulse 2s infinite;"></span>
+                    Online
                 </span>
             </li>
         </ul>
@@ -49,162 +25,34 @@
 </nav>
 
 <style>
-    .navbar {
-        background: var(--card-bg);
-        border-bottom: 1px solid var(--border-color);
-        padding: 0 2rem;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        backdrop-filter: blur(10px);
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+    nav > div > button { display: block !important; }
+    #navMenu {
+        display: none !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        position: absolute !important;
+        top: 70px !important;
+        left: 0 !important;
+        background: var(--card-bg) !important;
+        padding: 20px !important;
+        border-bottom: 1px solid var(--border-color) !important;
     }
-    
-    .nav-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 70px;
-    }
-    
-    .nav-brand a {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: var(--text-color);
-    }
-    
-    .nav-brand i {
-        color: var(--danger-color);
-        font-size: 1.8rem;
-    }
-    
-    .text-accent {
-        color: var(--primary-color);
-    }
-    
-    .nav-toggle {
-        display: none;
-        background: none;
-        border: none;
-        color: var(--text-color);
-        font-size: 1.5rem;
-        cursor: pointer;
-        padding: 5px;
-    }
-    
-    .nav-menu {
-        display: flex;
-        list-style: none;
-        gap: 5px;
-        margin: 0;
-        padding: 0;
-        align-items: center;
-    }
-    
-    .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        border-radius: 8px;
-        text-decoration: none;
-        color: var(--text-muted);
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    
-    .nav-link:hover {
-        background: var(--background-secondary);
-        color: var(--text-color);
-    }
-    
-    .nav-link.active {
-        background: var(--primary-color);
-        color: white;
-    }
-    
-    .nav-status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 14px;
-        background: var(--background-secondary);
-        border-radius: 20px;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-left: 10px;
-    }
-    
-    .status-dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-    }
-    
-    .status-dot.online {
-        background: var(--success-color);
-        animation: pulse 2s infinite;
-    }
-    
-    .status-dot.offline {
-        background: var(--danger-color);
-    }
-    
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-    
-    @media (max-width: 768px) {
-        .nav-toggle {
-            display: block;
-        }
-        
-        .nav-menu {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            position: absolute;
-            top: 70px;
-            left: 0;
-            background: var(--card-bg);
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            gap: 5px;
-        }
-        
-        .nav-menu.active {
-            display: flex;
-        }
-        
-        .nav-link {
-            padding: 12px 16px;
-        }
-        
-        .nav-status {
-            margin-left: 0;
-            justify-content: center;
-            width: 100%;
-        }
-    }
+    #navMenu.active { display: flex !important; }
+    #navMenu li { width: 100%; }
+    #navMenu li a { padding: 12px 16px !important; }
+}
 </style>
 
 <script>
-    function toggleNav() {
-        const menu = document.getElementById('nav-menu');
-        menu.classList.toggle('active');
-    }
-    
-    // Close menu on link click (mobile)
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            document.getElementById('nav-menu').classList.remove('active');
-        });
+document.querySelectorAll('#navMenu a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('navMenu').classList.remove('active');
     });
+});
 </script>
