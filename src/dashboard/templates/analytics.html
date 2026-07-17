@@ -1,268 +1,151 @@
-<!-- src/dashboard/templates/analytics.html -->
-{% extends "base.html" %}
+   {% extends "base.html" %}
 
-{% block title %} Analytics - Keylogger Statistics{% endblock %}
+{% block title %}Analytics - Keylogger Lab{% endblock %}
 
 {% block content %}
-<div class="analytics-header">
-    <h1><i class="fas fa-chart-pie"></i> Keystroke Analytics</h1>
-    <p class="text-muted">Statistical analysis of keyboard activity</p>
-</div>
+<h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 30px;">
+    <i class="fas fa-chart-pie" style="color: var(--info-color);"></i> Analytics
+</h1>
 
-<!-- Statistics Overview -->
-<div class="stats-overview">
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-keyboard"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Total Keystrokes</div>
-            <div class="stat-value" id="total-keystrokes">1,247</div>
-        </div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Total Keystrokes</div>
+        <div style="font-size: 2rem; font-weight: 700;" id="total-keystrokes">0</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-user"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Active Sessions</div>
-            <div class="stat-value" id="active-sessions">3</div>
-        </div>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Active Sessions</div>
+        <div style="font-size: 2rem; font-weight: 700;">1</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Security Score</div>
-            <div class="stat-value" id="security-score">92%</div>
-        </div>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Security Score</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--success-color);" id="security-score">100%</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-clock"></i></div>
-        <div class="stat-content">
-            <div class="stat-label">Avg. Session</div>
-            <div class="stat-value" id="avg-session">12:34</div>
-        </div>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">Avg Session</div>
+        <div style="font-size: 2rem; font-weight: 700;" id="avg-session">00:00:00</div>
     </div>
 </div>
 
-<!-- Charts Grid -->
-<div class="charts-grid">
-    <div class="chart-card">
-        <h3><i class="fas fa-chart-line"></i> Keystrokes Over Time</h3>
-        <canvas id="timeChart"></canvas>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-chart-line"></i> Activity Over Time</h3>
+        <canvas id="activityChart" height="250"></canvas>
     </div>
-    <div class="chart-card">
-        <h3><i class="fas fa-chart-bar"></i> Top Keys Used</h3>
-        <canvas id="keysChart"></canvas>
-    </div>
-</div>
-
-<div class="charts-grid">
-    <div class="chart-card">
-        <h3><i class="fas fa-pie-chart"></i> Key Categories</h3>
-        <canvas id="categoriesChart"></canvas>
-    </div>
-    <div class="chart-card">
-        <h3><i class="fas fa-clock"></i> Activity by Hour</h3>
-        <canvas id="hourlyChart"></canvas>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-chart-bar"></i> Key Frequency</h3>
+        <canvas id="frequencyChart" height="250"></canvas>
     </div>
 </div>
 
-<!-- Report Generation -->
-<div class="report-section">
-    <h3><i class="fas fa-file-pdf"></i> Generate Report</h3>
-    <div class="report-controls">
-        <select id="report-format" class="form-control">
-            <option value="pdf">PDF Report</option>
-            <option value="html">HTML Report</option>
-            <option value="json">JSON Data</option>
-        </select>
-        <button class="btn btn-primary" onclick="generateReport()">
-            <i class="fas fa-download"></i> Generate Report
-        </button>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-pie-chart"></i> Key Categories</h3>
+        <canvas id="categoryChart" height="250"></canvas>
     </div>
-    <div id="report-status"></div>
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-clock"></i> Hourly Activity</h3>
+        <canvas id="hourlyChart" height="250"></canvas>
+    </div>
 </div>
-
-<style>
-    .analytics-header {
-        margin-bottom: 30px;
-    }
-    
-    .analytics-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-    }
-    
-    .analytics-header h1 i {
-        color: var(--info-color);
-    }
-    
-    .stats-overview {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .charts-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .chart-card {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .chart-card h3 {
-        margin-bottom: 15px;
-        font-size: 1rem;
-    }
-    
-    .chart-card canvas {
-        max-height: 300px;
-    }
-    
-    .report-section {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 25px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .report-section h3 {
-        margin-bottom: 15px;
-        font-size: 1.1rem;
-    }
-    
-    .report-controls {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .form-control {
-        padding: 8px 12px;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        background: var(--background-secondary);
-        color: var(--text-color);
-        font-size: 0.95rem;
-        min-width: 150px;
-    }
-    
-    .form-control:focus {
-        outline: none;
-        border-color: var(--primary-color);
-    }
-    
-    #report-status {
-        margin-top: 15px;
-        padding: 10px;
-        border-radius: 6px;
-    }
-    
-    @media (max-width: 768px) {
-        .charts-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .report-controls {
-            flex-direction: column;
-            align-items: stretch;
-        }
-    }
-</style>
 
 <script>
-    let timeChart, keysChart, categoriesChart, hourlyChart;
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize charts with sample data
-        // In production, fetch from API
-        initializeCharts();
-        fetchAnalytics();
-    });
-    
-    function initializeCharts() {
-        // Time Series Chart
-        const ctx1 = document.getElementById('timeChart').getContext('2d');
-        timeChart = new Chart(ctx1, {
+// Fetch analytics data
+fetch('/api/analytics-data')
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('total-keystrokes').textContent = data.total || 0;
+        
+        // Calculate score
+        const score = Math.max(0, 100 - ((data.sensitive || 0) * 2));
+        const scoreEl = document.getElementById('security-score');
+        scoreEl.textContent = Math.min(100, score) + '%';
+        scoreEl.style.color = score > 70 ? 'var(--success-color)' : score > 40 ? 'var(--warning-color)' : 'var(--danger-color)';
+        
+        // Activity Chart
+        new Chart(document.getElementById('activityChart'), {
             type: 'line',
             data: {
                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                 datasets: [{
                     label: 'Keystrokes',
-                    data: [120, 150, 180, 200, 170, 90, 60],
-                    borderColor: 'rgba(33, 150, 243, 1)',
-                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    data: data.time_series || [0, 0, 0, 0, 0, 0, 0],
+                    borderColor: 'rgba(88, 166, 255, 1)',
+                    backgroundColor: 'rgba(88, 166, 255, 0.1)',
                     fill: true,
                     tension: 0.4
                 }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { display: false }
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#8b949e' } },
+                    x: { ticks: { color: '#8b949e' } }
                 }
             }
         });
         
-        // Keys Frequency Chart
-        const ctx2 = document.getElementById('keysChart').getContext('2d');
-        keysChart = new Chart(ctx2, {
+        // Frequency Chart
+        const freqData = data.key_frequency || {};
+        const sorted = Object.entries(freqData).sort((a, b) => b[1] - a[1]).slice(0, 8);
+        
+        new Chart(document.getElementById('frequencyChart'), {
             type: 'bar',
             data: {
-                labels: ['E', 'T', 'A', 'O', 'I', 'N', 'S', 'H'],
+                labels: sorted.map(([k]) => k) || ['E', 'T', 'A', 'O', 'I', 'N', 'S', 'H'],
                 datasets: [{
                     label: 'Frequency',
-                    data: [85, 78, 72, 65, 60, 55, 50, 45],
-                    backgroundColor: 'rgba(76, 175, 80, 0.6)',
-                    borderColor: 'rgba(76, 175, 80, 1)',
+                    data: sorted.map(([,v]) => v) || [0, 0, 0, 0, 0, 0, 0, 0],
+                    backgroundColor: 'rgba(63, 185, 80, 0.6)',
+                    borderColor: 'rgba(63, 185, 80, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { display: false }
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#8b949e' } },
+                    x: { ticks: { color: '#8b949e' } }
                 }
             }
         });
         
-        // Categories Chart
-        const ctx3 = document.getElementById('categoriesChart').getContext('2d');
-        categoriesChart = new Chart(ctx3, {
+        // Category Chart
+        new Chart(document.getElementById('categoryChart'), {
             type: 'doughnut',
             data: {
                 labels: ['Letters', 'Numbers', 'Special', 'Function', 'Navigation'],
                 datasets: [{
                     data: [65, 15, 10, 5, 5],
                     backgroundColor: [
-                        'rgba(33, 150, 243, 0.8)',
-                        'rgba(76, 175, 80, 0.8)',
+                        'rgba(88, 166, 255, 0.8)',
+                        'rgba(63, 185, 80, 0.8)',
                         'rgba(255, 152, 0, 0.8)',
-                        'rgba(156, 39, 176, 0.8)',
-                        'rgba(244, 67, 54, 0.8)'
+                        'rgba(188, 140, 255, 0.8)',
+                        'rgba(248, 81, 73, 0.8)'
                     ]
                 }]
             },
             options: {
-                responsive: true
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#8b949e' } }
+                }
             }
         });
         
-        // Hourly Activity Chart
-        const ctx4 = document.getElementById('hourlyChart').getContext('2d');
-        hourlyChart = new Chart(ctx4, {
+        // Hourly Chart
+        new Chart(document.getElementById('hourlyChart'), {
             type: 'bar',
             data: {
-                labels: ['0h', '2h', '4h', '6h', '8h', '10h', '12h', '14h', '16h', '18h', '20h', '22h'],
+                labels: ['12a', '2a', '4a', '6a', '8a', '10a', '12p', '2p', '4p', '6p', '8p', '10p'],
                 datasets: [{
                     label: 'Activity',
-                    data: [5, 2, 0, 0, 10, 35, 50, 65, 80, 45, 30, 15],
+                    data: [0, 0, 0, 0, 5, 15, 25, 30, 20, 10, 5, 0],
                     backgroundColor: 'rgba(255, 152, 0, 0.6)',
                     borderColor: 'rgba(255, 152, 0, 1)',
                     borderWidth: 1
@@ -270,93 +153,26 @@
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { display: false }
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#8b949e' } },
+                    x: { ticks: { color: '#8b949e' } }
                 }
             }
         });
-    }
-    
-    function fetchAnalytics() {
-        fetch('/api/analytics')
-            .then(response => response.json())
-            .then(data => {
-                updateStats(data);
-                updateCharts(data);
-            })
-            .catch(error => console.error('Error fetching analytics:', error));
-    }
-    
-    function updateStats(data) {
-        if (data.total) {
-            document.getElementById('total-keystrokes').textContent = 
-                data.total.toLocaleString();
-        }
-        if (data.sessions) {
-            document.getElementById('active-sessions').textContent = data.sessions;
-        }
-        if (data.security_score) {
-            document.getElementById('security-score').textContent = 
-                `${data.security_score}%`;
-        }
-        if (data.avg_session) {
-            document.getElementById('avg-session').textContent = data.avg_session;
-        }
-    }
-    
-    function updateCharts(data) {
-        // Update chart data
-        if (data.time_series && timeChart) {
-            timeChart.data.datasets[0].data = data.time_series;
-            timeChart.update();
-        }
-        
-        if (data.key_frequency && keysChart) {
-            const sorted = Object.entries(data.key_frequency)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 8);
-            keysChart.data.labels = sorted.map(([key]) => key);
-            keysChart.data.datasets[0].data = sorted.map(([, count]) => count);
-            keysChart.update();
-        }
-    }
-    
-    function generateReport() {
-        const format = document.getElementById('report-format').value;
-        const statusDiv = document.getElementById('report-status');
-        
-        statusDiv.innerHTML = `
-            <div class="alert alert-info">
-                <i class="fas fa-spinner fa-spin"></i> Generating ${format.toUpperCase()} report...
-            </div>
-        `;
-        
-        fetch(`/api/report?format=${format}`)
-            .then(response => response.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `keylogger-report.${format === 'pdf' ? 'pdf' : 
-                              format === 'html' ? 'html' : 'json'}`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                
-                statusDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i> Report generated successfully!
-                    </div>
-                `;
-            })
-            .catch(error => {
-                statusDiv.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-times-circle"></i> Failed to generate report: ${error}
-                    </div>
-                `;
-            });
-    }
+    })
+    .catch(console.error);
+
+// Session timer
+let seconds = 0;
+setInterval(() => {
+    seconds++;
+    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    const avg = document.getElementById('avg-session');
+    if (avg) avg.textContent = `${h}:${m}:${s}`;
+}, 1000);
 </script>
 {% endblock %}
