@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}About - Keylogger Lab{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 30px; text-align: center;">
+        <i class="fas fa-info-circle" style="color: var(--primary-color);"></i> About
+    </h1>
+    
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 30px; border: 1px solid var(--border-color);">
+        <div style="text-align: center; font-size: 4rem; color: var(--danger-color); margin-bottom: 20px;">
+            <i class="fas fa-shield-virus"></i>
+        </div>
+        
+        <h2 style="text-align: center; margin-bottom: 15px;"> Keylogger Cybersecurity Project</h2>
+        <p style="color: var(--text-muted); text-align: center; margin-bottom: 30px;">
+            An educational cybersecurity tool for understanding keyloggers and defense strategies.
+        </p>
+        
+        <div style="margin: 20px 0; padding: 15px; background: var(--background-secondary); border-radius: 8px; border-left: 4px solid var(--warning-color);">
+            <h3 style="font-size: 1rem; margin-bottom: 10px; color: var(--warning-color);">
+                <i class="fas fa-exclamation-triangle"></i> Educational Use Only
+            </h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">
+                This software is for <strong>educational purposes only</strong>. 
+                Use only on systems you own or have explicit permission to test.
+                Unauthorized use is prohibited by law.
+            </p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0;">
+            <div style="background: var(--background-secondary); padding: 15px; border-radius: 8px;">
+                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Version</h4>
+                <p style="font-weight: 600; font-size: 1.1rem;">1.0.0</p>
+            </div>
+            <div style="background: var(--background-secondary); padding: 15px; border-radius: 8px;">
+                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Platform</h4>
+                <p style="font-weight: 600; font-size: 1.1rem;">Python 3.8+</p>
+            </div>
+            <div style="background: var(--background-secondary); padding: 15px; border-radius: 8px;">
+                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">License</h4>
+                <p style="font-weight: 600; font-size: 1.1rem;">Educational Use</p>
+            </div>
+            <div style="background: var(--background-secondary); padding: 15px; border-radius: 8px;">
+                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Updated</h4>
+                <p style="font-weight: 600; font-size: 1.1rem;">2026-07-16</p>
+            </div>
+        </div>
+        
+        <div style="margin: 20px 0; padding: 15px; background: var(--background-secondary); border-radius: 8px;">
+            <h4 style="font-size: 0.9rem; margin-bottom: 10px;"> Features</h4>
+            <ul style="list-style: none; padding: 0; color: var(--text-muted); font-size: 0.9rem;">
+                <li style="padding: 5px 0;"> Real-time keystroke monitoring</li>
+                <li style="padding: 5px 0;"> Threat detection engine</li>
+                <li style="padding: 5px 0;"> Analytics dashboard</li>
+                <li style="padding: 5px 0;"> Encrypted logging</li>
+                <li style="padding: 5px 0;"> Educational disclaimer</li>
+            </ul>
+        </div>
+        
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+            <a href="/" style="padding: 10px 20px; background: var(--primary-color); color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="/dashboard" style="padding: 10px 20px; background: var(--background-secondary); color: var(--text-color); text-decoration: none; border-radius: 6px; font-weight: 500;">
+                <i class="fas fa-keyboard"></i> Dashboard
+            </a>
+            <a href="/detection" style="padding: 10px 20px; background: var(--background-secondary); color: var(--text-color); text-decoration: none; border-radius: 6px; font-weight: 500;">
+                <i class="fas fa-shield-alt"></i> Detection
+            </a>
+            <a href="/analytics" style="padding: 10px 20px; background: var(--background-secondary); color: var(--text-color); text-decoration: none; border-radius: 6px; font-weight: 500;">
+                <i class="fas fa-chart-pie"></i> Analytics
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
