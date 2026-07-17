@@ -1,1521 +1,176 @@
-<!-- src/dashboard/templates/settings.html -->
 {% extends "base.html" %}
 
-{% block title %}⚙️ Settings - Keylogger Dashboard{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* ============================================================================
-       SETTINGS PAGE SPECIFIC STYLES
-       ============================================================================ */
-    
-    .settings-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    
-    .settings-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 30px;
-    }
-    
-    .settings-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0;
-    }
-    
-    .settings-header h1 i {
-        color: var(--primary-color);
-        margin-right: 10px;
-    }
-    
-    .settings-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-    
-    .settings-actions .btn {
-        font-size: 0.85rem;
-    }
-    
-    #unsaved-indicator {
-        font-size: 0.8rem;
-        padding: 4px 12px;
-        animation: pulse 2s infinite;
-    }
-    
-    .settings-tabs {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 25px;
-        flex-wrap: wrap;
-        border-bottom: 2px solid var(--border-color);
-        padding-bottom: 10px;
-    }
-    
-    .tab-btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        background: transparent;
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 500;
-        font-size: 0.9rem;
-        font-family: var(--font-family);
-    }
-    
-    .tab-btn:hover {
-        background: var(--background-secondary);
-        color: var(--text-color);
-    }
-    
-    .tab-btn.active {
-        background: var(--primary-color);
-        color: white;
-    }
-    
-    .tab-btn i {
-        margin-right: 6px;
-    }
-    
-    .settings-panel {
-        display: none;
-        animation: fadeIn 0.3s ease-out;
-    }
-    
-    .settings-panel.active {
-        display: block;
-    }
-    
-    .settings-panel h3 {
-        margin-bottom: 20px;
-        font-size: 1.3rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .settings-panel h3 i {
-        color: var(--primary-color);
-    }
-    
-    .setting-group {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 1px solid var(--border-color);
-    }
-    
-    .setting-group-title {
-        font-weight: 600;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .setting-item {
-        padding: 12px 0;
-        border-bottom: 1px solid var(--border-color);
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex-wrap: wrap;
-    }
-    
-    .setting-item:last-child {
-        border-bottom: none;
-    }
-    
-    .setting-item label {
-        min-width: 180px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        color: var(--text-color);
-        font-size: 0.95rem;
-    }
-    
-    .setting-item label .label-icon {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-    
-    .setting-item input[type="text"],
-    .setting-item input[type="number"],
-    .setting-item input[type="password"],
-    .setting-item input[type="email"],
-    .setting-item select {
-        flex: 1;
-        min-width: 200px;
-        padding: 8px 12px;
-        background: var(--background-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        color: var(--text-color);
-        font-size: 0.9rem;
-        font-family: var(--font-family);
-        transition: all 0.3s ease;
-    }
-    
-    .setting-item input[type="text"]:focus,
-    .setting-item input[type="number"]:focus,
-    .setting-item input[type="password"]:focus,
-    .setting-item input[type="email"]:focus,
-    .setting-item select:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
-    }
-    
-    .setting-item input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--primary-color);
-        cursor: pointer;
-        flex-shrink: 0;
-    }
-    
-    .setting-item input[type="range"] {
-        flex: 1;
-        min-width: 200px;
-        accent-color: var(--primary-color);
-        cursor: pointer;
-    }
-    
-    .setting-item input[type="color"] {
-        width: 40px;
-        height: 40px;
-        padding: 2px;
-        border: 2px solid var(--border-color);
-        border-radius: 6px;
-        cursor: pointer;
-        background: transparent;
-    }
-    
-    .setting-item input[type="color"]:hover {
-        border-color: var(--primary-color);
-    }
-    
-    .setting-description {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        width: 100%;
-        padding-left: 0;
-        padding-top: 2px;
-    }
-    
-    .setting-item .range-wrapper {
-        flex: 1;
-        position: relative;
-        padding-top: 20px;
-        min-width: 200px;
-    }
-    
-    .range-display {
-        position: absolute;
-        top: 0;
-        transform: translateX(-50%);
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        pointer-events: none;
-        background: var(--background-secondary);
-        padding: 2px 8px;
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-        font-weight: 600;
-    }
-    
-    .setting-item .btn-sm {
-        padding: 4px 12px;
-        font-size: 0.75rem;
-    }
-    
-    .setting-item select[multiple] {
-        min-height: 80px;
-    }
-    
-    .setting-item .setting-value-display {
-        font-family: var(--font-mono);
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        padding: 4px 10px;
-        background: var(--background-secondary);
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-    }
-    
-    /* Danger Zone */
-    .danger-zone {
-        border: 2px solid var(--danger-color);
-        border-radius: 12px;
-        padding: 20px;
-        margin-top: 20px;
-        background: rgba(248, 81, 73, 0.05);
-    }
-    
-    .danger-zone .setting-group-title {
-        color: var(--danger-color);
-    }
-    
-    .danger-zone .btn-danger {
-        margin-top: 10px;
-    }
-    
-    /* Validation Errors Container */
-    #validation-errors {
-        margin-bottom: 20px;
-    }
-    
-    #validation-errors .alert {
-        margin-bottom: 0;
-    }
-    
-    #validation-errors ul {
-        margin: 8px 0 0 20px;
-        padding: 0;
-    }
-    
-    #validation-errors li {
-        margin-bottom: 4px;
-    }
-    
-    /* Settings Search */
-    .settings-search {
-        margin-bottom: 20px;
-    }
-    
-    .settings-search input {
-        width: 100%;
-        max-width: 400px;
-        padding: 10px 16px;
-        background: var(--background-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        color: var(--text-color);
-        font-size: 0.95rem;
-    }
-    
-    .settings-search input:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
-    }
-    
-    .settings-search input::placeholder {
-        color: var(--text-muted);
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-        .settings-container {
-            padding: 12px;
-        }
-        
-        .settings-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .settings-header h1 {
-            font-size: 1.5rem;
-        }
-        
-        .settings-actions {
-            justify-content: stretch;
-        }
-        
-        .settings-actions .btn {
-            flex: 1;
-            justify-content: center;
-            font-size: 0.8rem;
-            padding: 8px 12px;
-        }
-        
-        .settings-tabs {
-            gap: 3px;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            min-width: 60px;
-            text-align: center;
-            font-size: 0.8rem;
-            padding: 8px 12px;
-        }
-        
-        .tab-btn i {
-            margin-right: 4px;
-        }
-        
-        .setting-item {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 5px;
-        }
-        
-        .setting-item label {
-            min-width: unset;
-            font-size: 0.9rem;
-        }
-        
-        .setting-item input[type="text"],
-        .setting-item input[type="number"],
-        .setting-item input[type="password"],
-        .setting-item input[type="email"],
-        .setting-item select,
-        .setting-item input[type="range"] {
-            min-width: unset;
-            width: 100%;
-        }
-        
-        .setting-item .range-wrapper {
-            min-width: unset;
-        }
-        
-        .settings-search input {
-            max-width: 100%;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .settings-tabs {
-            flex-direction: column;
-        }
-        
-        .tab-btn {
-            text-align: left;
-        }
-        
-        .setting-group {
-            padding: 15px;
-        }
-        
-        .settings-actions .btn {
-            font-size: 0.75rem;
-        }
-    }
-</style>
-{% endblock %}
+{% block title %}Settings - Keylogger Lab{% endblock %}
 
 {% block content %}
-<div class="settings-container">
-    <!-- Header -->
-    <div class="settings-header">
-        <h1><i class="fas fa-cog"></i> Settings</h1>
-        <div class="settings-actions">
-            <span id="unsaved-indicator" class="badge badge-warning" style="display:none;">
-                <i class="fas fa-exclamation-triangle"></i> Unsaved Changes
-            </span>
-            <button class="btn btn-success" id="save-settings-btn">
-                <i class="fas fa-save"></i> Save Settings
-            </button>
-            <button class="btn btn-secondary" id="reset-settings-btn">
-                <i class="fas fa-undo"></i> Reset
-            </button>
-            <button class="btn btn-info" id="export-settings-btn">
-                <i class="fas fa-download"></i> Export
-            </button>
-            <button class="btn btn-info" id="import-settings-btn">
-                <i class="fas fa-upload"></i> Import
-            </button>
-            <input type="file" id="import-settings-file" accept=".json" style="display:none;">
-        </div>
-    </div>
-    
-    <!-- Validation Errors -->
-    <div id="validation-errors" style="display:none;"></div>
-    
-    <!-- Settings Search -->
-    <div class="settings-search">
-        <input type="text" id="settings-search-input" 
-               placeholder=" Search settings..." 
-               aria-label="Search settings">
-    </div>
-    
-    <!-- Settings Tabs -->
-    <div class="settings-tabs" role="tablist">
-        <button class="tab-btn active" data-tab="general" role="tab">
-            <i class="fas fa-cog"></i> General
-        </button>
-        <button class="tab-btn" data-tab="detection" role="tab">
-            <i class="fas fa-shield-alt"></i> Detection
-        </button>
-        <button class="tab-btn" data-tab="logging" role="tab">
-            <i class="fas fa-clipboard-list"></i> Logging
-        </button>
-        <button class="tab-btn" data-tab="exfiltration" role="tab">
-            <i class="fas fa-upload"></i> Exfiltration
-        </button>
-        <button class="tab-btn" data-tab="ui" role="tab">
-            <i class="fas fa-paint-brush"></i> UI
-        </button>
-        <button class="tab-btn" data-tab="security" role="tab">
-            <i class="fas fa-lock"></i> Security
-        </button>
-        <button class="tab-btn" data-tab="advanced" role="tab">
-            <i class="fas fa-code"></i> Advanced
-        </button>
-    </div>
-    
-    <!-- Settings Content -->
-    <div class="settings-content">
-        
-        <!-- ================================================================ -->
-        <!-- PANEL: GENERAL -->
-        <!-- ================================================================ -->
-        <div class="settings-panel active" id="panel-general" role="tabpanel">
-            <h3><i class="fas fa-cog"></i> General Settings</h3>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-sync-alt"></i> Auto-Refresh
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="general.autoRefresh" id="autoRefresh">
-                        Enable Auto-Refresh
-                    </label>
-                    <span class="setting-description">Automatically refresh dashboard data at the specified interval</span>
-                </div>
-                <div class="setting-item">
-                    <label>Refresh Interval</label>
-                    <div class="range-wrapper">
-                        <span class="range-display" id="refreshIntervalDisplay">5000ms</span>
-                        <input type="range" data-setting="general.refreshInterval" 
-                               id="refreshInterval" min="1000" max="60000" step="500" value="5000">
-                    </div>
-                    <span class="setting-description">Time between auto-refreshes (1-60 seconds)</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-desktop"></i> Display
-                </div>
-                <div class="setting-item">
-                    <label>Max Logs Display</label>
-                    <input type="number" data-setting="general.maxLogsDisplay" 
-                           id="maxLogsDisplay" min="10" max="1000" step="10" value="100">
-                    <span class="setting-description">Maximum number of log entries to show (10-1000)</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="general.enableNotifications" id="enableNotifications">
-                        Enable Notifications
-                    </label>
-                    <span class="setting-description">Show desktop and in-app notifications for important events</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="general.enableSound" id="enableSound">
-                        Enable Sound Alerts
-                    </label>
-                    <span class="setting-description">Play sounds for critical alerts and detections</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-globe"></i> Localization
-                </div>
-                <div class="setting-item">
-                    <label>Language</label>
-                    <select data-setting="general.language" id="languageSelect">
-                        <option value="en">🇺🇸 English</option>
-                        <option value="es">🇪🇸 Español</option>
-                        <option value="fr">🇫🇷 Français</option>
-                        <option value="de">🇩🇪 Deutsch</option>
-                        <option value="zh">🇨🇳 中文</option>
-                        <option value="ja">🇯🇵 日本語</option>
-                        <option value="ru">🇷🇺 Русский</option>
-                    </select>
-                    <span class="setting-description">Interface language</span>
-                </div>
-                <div class="setting-item">
-                    <label>Timezone</label>
-                    <select data-setting="general.timezone" id="timezoneSelect">
-                        <option value="UTC">UTC</option>
-                        <option value="America/New_York">America/New_York (ET)</option>
-                        <option value="America/Chicago">America/Chicago (CT)</option>
-                        <option value="America/Denver">America/Denver (MT)</option>
-                        <option value="America/Los_Angeles">America/Los_Angeles (PT)</option>
-                        <option value="Europe/London">Europe/London (GMT)</option>
-                        <option value="Europe/Paris">Europe/Paris (CET)</option>
-                        <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
-                        <option value="Australia/Sydney">Australia/Sydney (AEDT)</option>
-                    </select>
-                    <span class="setting-description">Display timezone for timestamps</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ================================================================ -->
-        <!-- PANEL: DETECTION -->
-        <!-- ================================================================ -->
-        <div class="settings-panel" id="panel-detection" role="tabpanel">
-            <h3><i class="fas fa-shield-alt"></i> Detection Settings</h3>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-search"></i> Scanning
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="detection.autoScan" id="autoScan">
-                        Auto-Scan
-                    </label>
-                    <span class="setting-description">Automatically scan for threats at the specified interval</span>
-                </div>
-                <div class="setting-item">
-                    <label>Scan Interval</label>
-                    <div class="range-wrapper">
-                        <span class="range-display" id="scanIntervalDisplay">30000ms</span>
-                        <input type="range" data-setting="detection.scanInterval" 
-                               id="scanInterval" min="5000" max="120000" step="5000" value="30000">
-                    </div>
-                    <span class="setting-description">Time between automatic scans (5-120 seconds)</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-exclamation-triangle"></i> Threat Detection
-                </div>
-                <div class="setting-item">
-                    <label>Threat Level Threshold</label>
-                    <select data-setting="detection.threatLevel" id="threatLevel">
-                        <option value="low"> Low - Alert on all threats</option>
-                        <option value="medium"> Medium - Alert on medium+ threats</option>
-                        <option value="high"> High - Alert on high+ threats only</option>
-                    </select>
-                    <span class="setting-description">Minimum threat level to trigger alerts</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="detection.enableNetworkMonitoring" id="enableNetworkMonitoring">
-                        Network Monitoring
-                    </label>
-                    <span class="setting-description">Monitor network connections for suspicious activity</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="detection.enableProcessMonitoring" id="enableProcessMonitoring">
-                        Process Monitoring
-                    </label>
-                    <span class="setting-description">Monitor running processes for keylogger signatures</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="detection.enableFileMonitoring" id="enableFileMonitoring">
-                        File Monitoring
-                    </label>
-                    <span class="setting-description">Monitor file system for suspicious files</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="detection.quarantineOnDetect" id="quarantineOnDetect">
-                        Auto-Quarantine
-                    </label>
-                    <span class="setting-description">Automatically quarantine detected threats</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="detection.autoMitigate" id="autoMitigate">
-                        Auto-Mitigate
-                    </label>
-                    <span class="setting-description">Automatically attempt to stop detected threats</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-list"></i> Ignored Processes
-                </div>
-                <div class="setting-item">
-                    <label>Whitelisted Processes</label>
-                    <input type="text" data-setting="detection.whitelistedProcesses" 
-                           id="whitelistedProcesses" placeholder="svchost.exe, explorer.exe, ...">
-                    <span class="setting-description">Comma-separated list of processes to ignore</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ================================================================ -->
-        <!-- PANEL: LOGGING -->
-        <!-- ================================================================ -->
-        <div class="settings-panel" id="panel-logging" role="tabpanel">
-            <h3><i class="fas fa-clipboard-list"></i> Logging Settings</h3>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-pen"></i> Log Behavior
-                </div>
-                <div class="setting-item">
-                    <label>Log Level</label>
-                    <select data-setting="logging.logLevel" id="logLevel">
-                        <option value="debug"> Debug - All logs</option>
-                        <option value="info"> Info - General logs</option>
-                        <option value="warning"> Warning - Important issues</option>
-                        <option value="error"> Error - Critical issues only</option>
-                    </select>
-                    <span class="setting-description">Minimum log level to record</span>
-                </div>
-                <div class="setting-item">
-                    <label>Max Log Size</label>
-                    <input type="number" data-setting="logging.maxLogSize" 
-                           id="maxLogSize" min="1" max="100" step="1" value="10">
-                    <span class="setting-description">Maximum log file size in MB (1-100)</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="logging.logRotation" id="logRotation">
-                        Enable Log Rotation
-                    </label>
-                    <span class="setting-description">Automatically rotate logs when max size is reached</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-keyboard"></i> Keystroke Logging
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="logging.encryptLogs" id="encryptLogs">
-                        Encrypt Logs
-                    </label>
-                    <span class="setting-description">Encrypt log files using AES-256 encryption</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="logging.includeTimestamps" id="includeTimestamps">
-                        Include Timestamps
-                    </label>
-                    <span class="setting-description">Add timestamps to each keystroke entry</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="logging.includeWindowTitles" id="includeWindowTitles">
-                        Include Window Titles
-                    </label>
-                    <span class="setting-description">Log which window/app was active when typing</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="logging.logSpecialKeys" id="logSpecialKeys">
-                        Log Special Keys
-                    </label>
-                    <span class="setting-description">Log function keys, modifier keys, etc.</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="logging.logMouseEvents" id="logMouseEvents">
-                        Log Mouse Events
-                    </label>
-                    <span class="setting-description">Log mouse clicks and movements</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="logging.logClipboard" id="logClipboard">
-                        Log Clipboard Activity
-                    </label>
-                    <span class="setting-description">Log clipboard copy/paste operations</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-filter"></i> Filtering
-                </div>
-                <div class="setting-item">
-                    <label>Excluded Applications</label>
-                    <input type="text" data-setting="logging.excludedApps" 
-                           id="excludedApps" placeholder="calc.exe, notepad.exe, ...">
-                    <span class="setting-description">Applications to exclude from logging (comma-separated)</span>
-                </div>
-                <div class="setting-item">
-                    <label>Excluded Keys</label>
-                    <input type="text" data-setting="logging.excludedKeys" 
-                           id="excludedKeys" placeholder="Tab, CapsLock, ...">
-                    <span class="setting-description">Keys to exclude from logging (comma-separated)</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ================================================================ -->
-        <!-- PANEL: EXFILTRATION -->
-        <!-- ================================================================ -->
-        <div class="settings-panel" id="panel-exfiltration" role="tabpanel">
-            <h3><i class="fas fa-upload"></i> Exfiltration Settings</h3>
-            
-            <div class="alert alert-warning">
-                <i class="fas fa-exclamation-triangle"></i>
-                <div>
-                    <strong> EDUCATIONAL USE ONLY</strong>
-                    <p class="setting-description" style="margin-top: 4px;">
-                        This simulates data exfiltration for cybersecurity training. 
-                        Only use in authorized lab environments.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-upload"></i> Exfiltration Settings
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="exfiltration.enabled" id="exfiltrationEnabled">
-                        Enable Exfiltration
-                    </label>
-                    <span class="setting-description">Enable simulated data exfiltration (educational use only)</span>
-                </div>
-                <div class="setting-item">
-                    <label>Exfiltration Method</label>
-                    <select data-setting="exfiltration.method" id="exfiltrationMethod">
-                        <option value="email"> Email (SMTP)</option>
-                        <option value="ftp"> FTP</option>
-                        <option value="http"> HTTP/HTTPS</option>
-                        <option value="none"> None</option>
-                    </select>
-                    <span class="setting-description">Method to use for data exfiltration</span>
-                </div>
-                <div class="setting-item">
-                    <label>Send Interval</label>
-                    <div class="range-wrapper">
-                        <span class="range-display" id="sendIntervalDisplay">3600s</span>
-                        <input type="range" data-setting="exfiltration.sendInterval" 
-                               id="sendInterval" min="60" max="86400" step="60" value="3600">
-                    </div>
-                    <span class="setting-description">How often to send exfiltrated data (1-86400 seconds)</span>
-                </div>
-                <div class="setting-item">
-                    <label>Max Batch Size</label>
-                    <input type="number" data-setting="exfiltration.maxBatchSize" 
-                           id="maxBatchSize" min="10" max="1000" step="10" value="100">
-                    <span class="setting-description">Maximum entries per batch (10-1000)</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="exfiltration.encryptExfiltration" id="encryptExfiltration">
-                        Encrypt Exfiltrated Data
-                    </label>
-                    <span class="setting-description">Encrypt data before sending</span>
-                </div>
-            </div>
-            
-            <div class="setting-group" id="email-settings">
-                <div class="setting-group-title">
-                    <i class="fas fa-envelope"></i> Email Settings
-                </div>
-                <div class="setting-item">
-                    <label>SMTP Server</label>
-                    <input type="text" data-setting="exfiltration.smtpServer" 
-                           id="smtpServer" placeholder="smtp.gmail.com">
-                    <span class="setting-description">SMTP server address</span>
-                </div>
-                <div class="setting-item">
-                    <label>SMTP Port</label>
-                    <input type="number" data-setting="exfiltration.smtpPort" 
-                           id="smtpPort" min="1" max="65535" value="587">
-                    <span class="setting-description">SMTP server port</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="exfiltration.useTLS" id="useTLS">
-                        Use TLS
-                    </label>
-                    <span class="setting-description">Use TLS encryption for SMTP</span>
-                </div>
-                <div class="setting-item">
-                    <label>Recipient Email</label>
-                    <input type="email" data-setting="exfiltration.emailRecipient" 
-                           id="emailRecipient" placeholder="security-lab@example.com">
-                    <span class="setting-description">Email address to receive logs</span>
-                </div>
-            </div>
-            
-            <div class="setting-group" id="ftp-settings">
-                <div class="setting-group-title">
-                    <i class="fas fa-folder"></i> FTP Settings
-                </div>
-                <div class="setting-item">
-                    <label>FTP Host</label>
-                    <input type="text" data-setting="exfiltration.ftpHost" 
-                           id="ftpHost" placeholder="ftp.example.com">
-                    <span class="setting-description">FTP server hostname</span>
-                </div>
-                <div class="setting-item">
-                    <label>FTP Port</label>
-                    <input type="number" data-setting="exfiltration.ftpPort" 
-                           id="ftpPort" min="1" max="65535" value="21">
-                    <span class="setting-description">FTP server port</span>
-                </div>
-                <div class="setting-item">
-                    <label>FTP Username</label>
-                    <input type="text" data-setting="exfiltration.ftpUsername" 
-                           id="ftpUsername" placeholder="username">
-                    <span class="setting-description">FTP username</span>
-                </div>
-                <div class="setting-item">
-                    <label>FTP Password</label>
-                    <input type="password" data-setting="exfiltration.ftpPassword" 
-                           id="ftpPassword" placeholder="••••••••">
-                    <span class="setting-description">FTP password</span>
-                </div>
-            </div>
-            
-            <div class="setting-group" id="http-settings">
-                <div class="setting-group-title">
-                    <i class="fas fa-cloud"></i> HTTP Settings
-                </div>
-                <div class="setting-item">
-                    <label>HTTP Endpoint</label>
-                    <input type="text" data-setting="exfiltration.httpEndpoint" 
-                           id="httpEndpoint" placeholder="https://example.com/api/logs">
-                    <span class="setting-description">HTTP endpoint to send logs to</span>
-                </div>
-                <div class="setting-item">
-                    <label>API Key</label>
-                    <input type="password" data-setting="exfiltration.httpApiKey" 
-                           id="httpApiKey" placeholder="••••••••">
-                    <span class="setting-description">API key for authentication</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ================================================================ -->
-        <!-- PANEL: UI -->
-        <!-- ================================================================ -->
-        <div class="settings-panel" id="panel-ui" role="tabpanel">
-            <h3><i class="fas fa-paint-brush"></i> UI Settings</h3>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-palette"></i> Theme
-                </div>
-                <div class="setting-item">
-                    <label>Theme</label>
-                    <select data-setting="ui.theme" id="uiTheme">
-                        <option value="dark"> Dark</option>
-                        <option value="light"> Light</option>
-                        <option value="system"> System Default</option>
-                        <option value="matrix"> Matrix</option>
-                        <option value="cyberpunk"> Cyberpunk</option>
-                        <option value="ocean"> Ocean</option>
-                        <option value="sunset"> Sunset</option>
-                        <option value="forest"> Forest</option>
-                    </select>
-                    <span class="setting-description">Color theme for the dashboard</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="ui.compactMode" id="compactMode">
-                        Compact Mode
-                    </label>
-                    <span class="setting-description">Reduce spacing for more content density</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-chart-bar"></i> Chart Settings
-                </div>
-                <div class="setting-item">
-                    <label>Chart Type</label>
-                    <select data-setting="ui.chartType" id="chartType">
-                        <option value="bar"> Bar Chart</option>
-                        <option value="line"> Line Chart</option>
-                        <option value="area"> Area Chart</option>
-                    </select>
-                    <span class="setting-description">Default chart visualization type</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-eye"></i> Display Options
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="ui.showTimestamps" id="showTimestamps">
-                        Show Timestamps
-                    </label>
-                    <span class="setting-description">Display timestamps in log entries</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="ui.showWindowTitles" id="showWindowTitles">
-                        Show Window Titles
-                    </label>
-                    <span class="setting-description">Display window titles in log entries</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="ui.highlightSensitive" id="highlightSensitive">
-                        Highlight Sensitive Data
-                    </label>
-                    <span class="setting-description">Visually highlight potential sensitive information</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-calendar"></i> Date & Time
-                </div>
-                <div class="setting-item">
-                    <label>Date Format</label>
-                    <select data-setting="ui.dateFormat" id="dateFormat">
-                        <option value="YYYY-MM-DD HH:mm:ss">2024-01-15 10:30:45</option>
-                        <option value="MM/DD/YYYY HH:mm:ss">01/15/2024 10:30:45</option>
-                        <option value="DD/MM/YYYY HH:mm:ss">15/01/2024 10:30:45</option>
-                        <option value="MMM DD, YYYY HH:mm">Jan 15, 2024 10:30</option>
-                        <option value="relative">Relative (5 minutes ago)</option>
-                    </select>
-                    <span class="setting-description">Format for displaying timestamps</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ================================================================ -->
-        <!-- PANEL: SECURITY -->
-        <!-- ================================================================ -->
-        <div class="settings-panel" id="panel-security" role="tabpanel">
-            <h3><i class="fas fa-lock"></i> Security Settings</h3>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-user-shield"></i> Authentication
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="security.requireAuthentication" id="requireAuthentication">
-                        Require Authentication
-                    </label>
-                    <span class="setting-description">Require login to access the dashboard</span>
-                </div>
-                <div class="setting-item">
-                    <label>Session Timeout</label>
-                    <div class="range-wrapper">
-                        <span class="range-display" id="sessionTimeoutDisplay">3600s</span>
-                        <input type="range" data-setting="security.sessionTimeout" 
-                               id="sessionTimeout" min="300" max="86400" step="300" value="3600">
-                    </div>
-                    <span class="setting-description">Session timeout in seconds (5 min - 24 hours)</span>
-                </div>
-                <div class="setting-item">
-                    <label>Max Login Attempts</label>
-                    <input type="number" data-setting="security.maxLoginAttempts" 
-                           id="maxLoginAttempts" min="1" max="20" step="1" value="5">
-                    <span class="setting-description">Maximum failed login attempts before lockout</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="security.enableMFA" id="enableMFA">
-                        Enable MFA
-                    </label>
-                    <span class="setting-description">Require multi-factor authentication (2FA)</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-key"></i> Password Policy
-                </div>
-                <div class="setting-item">
-                    <label>Password Policy</label>
-                    <select data-setting="security.passwordPolicy" id="passwordPolicy">
-                        <option value="weak"> Weak - Minimum 4 characters</option>
-                        <option value="medium"> Medium - 8 chars, mixed case, numbers</option>
-                        <option value="strong"> Strong - 12 chars, mixed case, numbers, special</option>
-                    </select>
-                    <span class="setting-description">Password complexity requirements</span>
-                </div>
-                <div class="setting-item">
-                    <label>Change Password</label>
-                    <button class="btn btn-secondary btn-sm" onclick="changePassword()">
-                        <i class="fas fa-key"></i> Change Password
-                    </button>
-                    <span class="setting-description">Update your account password</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-clipboard-check"></i> Audit
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="security.enableAuditLog" id="enableAuditLog">
-                        Enable Audit Log
-                    </label>
-                    <span class="setting-description">Log all security-related events</span>
-                </div>
-                <div class="setting-item">
-                    <label>Audit Log Retention</label>
-                    <input type="number" data-setting="security.auditLogRetention" 
-                           id="auditLogRetention" min="1" max="365" step="1" value="30">
-                    <span class="setting-description">Number of days to keep audit logs (1-365)</span>
-                </div>
-            </div>
-            
-            <!-- Danger Zone -->
-            <div class="danger-zone">
-                <div class="setting-group-title">
-                    <i class="fas fa-exclamation-triangle"></i> Danger Zone
-                </div>
-                <div class="setting-item">
-                    <label>Clear All Data</label>
-                    <button class="btn btn-danger" onclick="clearAllData()">
-                        <i class="fas fa-trash"></i> Clear All Logs & Data
-                    </button>
-                    <span class="setting-description">Permanently delete all logs and stored data</span>
-                </div>
-                <div class="setting-item">
-                    <label>Reset Application</label>
-                    <button class="btn btn-danger" onclick="resetApplication()">
-                        <i class="fas fa-power-off"></i> Factory Reset
-                    </button>
-                    <span class="setting-description">Reset all settings and data to factory defaults</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ================================================================ -->
-        <!-- PANEL: ADVANCED -->
-        <!-- ================================================================ -->
-        <div class="settings-panel" id="panel-advanced" role="tabpanel">
-            <h3><i class="fas fa-code"></i> Advanced Settings</h3>
-            
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <strong> Advanced Settings</strong>
-                    <p class="setting-description" style="margin-top: 4px;">
-                        These settings are for advanced users. Incorrect configuration 
-                        may affect application performance.
-                    </p>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-bug"></i> Debug
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="advanced.debugMode" id="debugMode">
-                        Debug Mode
-                    </label>
-                    <span class="setting-description">Enable debug logging and development tools</span>
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="advanced.enableExperimental" id="enableExperimental">
-                        Enable Experimental Features
-                    </label>
-                    <span class="setting-description">Enable experimental and beta features</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-microchip"></i> Performance
-                </div>
-                <div class="setting-item">
-                    <label>Max Concurrent Scans</label>
-                    <input type="number" data-setting="advanced.maxConcurrentScans" 
-                           id="maxConcurrentScans" min="1" max="10" step="1" value="3">
-                    <span class="setting-description">Maximum number of simultaneous scans (1-10)</span>
-                </div>
-                <div class="setting-item">
-                    <label>Memory Limit</label>
-                    <div class="range-wrapper">
-                        <span class="range-display" id="memoryLimitDisplay">512MB</span>
-                        <input type="range" data-setting="advanced.memoryLimit" 
-                               id="memoryLimit" min="128" max="2048" step="64" value="512">
-                    </div>
-                    <span class="setting-description">Maximum memory usage in MB (128-2048)</span>
-                </div>
-                <div class="setting-item">
-                    <label>CPU Limit</label>
-                    <div class="range-wrapper">
-                        <span class="range-display" id="cpuLimitDisplay">50%</span>
-                        <input type="range" data-setting="advanced.cpuLimit" 
-                               id="cpuLimit" min="10" max="100" step="5" value="50">
-                    </div>
-                    <span class="setting-description">Maximum CPU usage percentage (10-100)</span>
-                </div>
-                <div class="setting-item">
-                    <label>Network Timeout</label>
-                    <div class="range-wrapper">
-                        <span class="range-display" id="networkTimeoutDisplay">30s</span>
-                        <input type="range" data-setting="advanced.networkTimeout" 
-                               id="networkTimeout" min="5" max="120" step="5" value="30">
-                    </div>
-                    <span class="setting-description">Network request timeout in seconds (5-120)</span>
-                </div>
-            </div>
-            
-            <div class="setting-group">
-                <div class="setting-group-title">
-                    <i class="fas fa-network-wired"></i> Proxy Settings
-                </div>
-                <div class="setting-item">
-                    <label>
-                        <input type="checkbox" data-setting="advanced.proxyEnabled" id="proxyEnabled">
-                        Enable Proxy
-                    </label>
-                    <span class="setting-description">Route network traffic through a proxy</span>
-                </div>
-                <div class="setting-item">
-                    <label>Proxy Host</label>
-                    <input type="text" data-setting="advanced.proxyHost" 
-                           id="proxyHost" placeholder="proxy.example.com">
-                    <span class="setting-description">Proxy server hostname</span>
-                </div>
-                <div class="setting-item">
-                    <label>Proxy Port</label>
-                    <input type="number" data-setting="advanced.proxyPort" 
-                           id="proxyPort" min="1" max="65535" value="8080">
-                    <span class="setting-description">Proxy server port</span>
-                </div>
-                <div class="setting-item">
-                    <label>Proxy Username</label>
-                    <input type="text" data-setting="advanced.proxyUsername" 
-                           id="proxyUsername" placeholder="username">
-                    <span class="setting-description">Proxy authentication username</span>
-                </div>
-                <div class="setting-item">
-                    <label>Proxy Password</label>
-                    <input type="password" data-setting="advanced.proxyPassword" 
-                           id="proxyPassword" placeholder="••••••••">
-                    <span class="setting-description">Proxy authentication password</span>
-                </div>
-            </div>
-        </div>
-        
-    </div><!-- /settings-content -->
-</div><!-- /settings-container -->
+<h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 30px;">
+    <i class="fas fa-cog" style="color: var(--primary-color);"></i> Settings
+</h1>
 
-<!-- Settings Status Bar -->
-<div id="settings-status-bar" style="display:none; position:fixed; bottom:0; left:0; right:0; 
-     background:var(--card-bg); border-top:1px solid var(--border-color); 
-     padding:10px 20px; z-index:1000; display:flex; justify-content:space-between; 
-     align-items:center; flex-wrap:wrap; gap:10px;">
-    <span id="status-message"><i class="fas fa-info-circle"></i> Settings loaded</span>
-    <div>
-        <button class="btn btn-secondary btn-sm" onclick="dismissStatusBar()">Dismiss</button>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <!-- General Settings -->
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-sync-alt"></i> Auto-Refresh</h3>
+        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" checked id="autoRefresh"> Enable Auto-Refresh
+            </label>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Refresh every 5 seconds</span>
+        </div>
+        <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" checked id="notifications"> Enable Notifications
+            </label>
+        </div>
+    </div>
+    
+    <!-- Theme Settings -->
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-palette"></i> Theme</h3>
+        <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <select id="themeSelect" style="padding: 8px 12px; background: var(--background-secondary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-color); flex: 1; min-width: 150px;">
+                <option value="dark"> Dark</option>
+                <option value="light"> Light</option>
+                <option value="system"> System Default</option>
+            </select>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Select your preferred theme</span>
+        </div>
+    </div>
+    
+    <!-- Detection Settings -->
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-shield-alt"></i> Detection</h3>
+        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="autoScan"> Auto-Scan
+            </label>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Scan every 30 seconds</span>
+        </div>
+        <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="autoMitigate"> Auto-Mitigate
+            </label>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Automatically terminate threats</span>
+        </div>
+    </div>
+    
+    <!-- Logging Settings -->
+    <div style="background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color);">
+        <h3 style="margin-bottom: 15px;"><i class="fas fa-clipboard-list"></i> Logging</h3>
+        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" checked id="encryptLogs"> Encrypt Logs
+            </label>
+        </div>
+        <div style="padding: 10px 0; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" checked id="includeTimestamps"> Include Timestamps
+            </label>
+        </div>
+        <div style="padding: 10px 0; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="logWindowTitles"> Log Window Titles
+            </label>
+        </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
+<!-- Danger Zone -->
+<div style="margin-top: 30px; padding: 20px; background: rgba(248, 81, 73, 0.05); border-radius: 12px; border: 2px solid var(--danger-color);">
+    <h3 style="color: var(--danger-color); margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button onclick="clearAllData()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--danger-color); color: white; cursor: pointer; font-weight: 600;">
+            <i class="fas fa-trash"></i> Clear All Data
+        </button>
+        <button onclick="resetApp()" style="padding: 10px 20px; border: none; border-radius: 8px; background: var(--danger-color); color: white; cursor: pointer; font-weight: 600;">
+            <i class="fas fa-power-off"></i> Factory Reset
+        </button>
+    </div>
+</div>
+
+<!-- Save Button -->
+<div style="margin-top: 20px; padding: 20px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color);">
+    <button onclick="saveSettings()" style="padding: 12px 30px; border: none; border-radius: 8px; background: var(--success-color); color: white; cursor: pointer; font-weight: 600; font-size: 1rem;">
+        <i class="fas fa-save"></i> Save Settings
+    </button>
+    <span id="saveStatus" style="margin-left: 15px; color: var(--text-muted);"></span>
+</div>
+
 <script>
-    // ============================================================================
-    // SETTINGS PAGE JAVASCRIPT
-    // ============================================================================
+function saveSettings() {
+    const status = document.getElementById('saveStatus');
+    status.textContent = ' Saving...';
+    status.style.color = 'var(--text-muted)';
     
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tab switching
-        initTabs();
-        
-        // Initialize range displays
-        initRangeDisplays();
-        
-        // Initialize settings search
-        initSearch();
-        
-        // Load settings into UI
-        if (window.settingsManager) {
-            window.settingsManager.renderSettings();
-        }
-        
-        // Setup event listeners
-        setupEventListeners();
-    });
+    const settings = {
+        autoRefresh: document.getElementById('autoRefresh').checked,
+        notifications: document.getElementById('notifications').checked,
+        theme: document.getElementById('themeSelect').value,
+        autoScan: document.getElementById('autoScan').checked,
+        autoMitigate: document.getElementById('autoMitigate').checked,
+        encryptLogs: document.getElementById('encryptLogs').checked,
+        includeTimestamps: document.getElementById('includeTimestamps').checked,
+        logWindowTitles: document.getElementById('logWindowTitles').checked
+    };
     
-    function initTabs() {
-        const tabs = document.querySelectorAll('.tab-btn');
-        const panels = {
-            general: document.getElementById('panel-general'),
-            detection: document.getElementById('panel-detection'),
-            logging: document.getElementById('panel-logging'),
-            exfiltration: document.getElementById('panel-exfiltration'),
-            ui: document.getElementById('panel-ui'),
-            security: document.getElementById('panel-security'),
-            advanced: document.getElementById('panel-advanced')
-        };
+    // Simulate save
+    setTimeout(() => {
+        status.textContent = ' Settings saved successfully!';
+        status.style.color = 'var(--success-color)';
         
-        tabs.forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Remove active from all tabs
-                tabs.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Hide all panels
-                Object.values(panels).forEach(p => p.classList.remove('active'));
-                
-                // Show selected panel
-                const panelId = this.dataset.tab;
-                if (panels[panelId]) {
-                    panels[panelId].classList.add('active');
-                }
-            });
-        });
+        // Apply theme
+        applyTheme(settings.theme);
+        
+        setTimeout(() => {
+            status.textContent = '';
+        }, 3000);
+    }, 1000);
+}
+
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.style.setProperty('--background-primary', '#ffffff');
+        document.documentElement.style.setProperty('--background-secondary', '#f6f8fa');
+        document.documentElement.style.setProperty('--card-bg', '#ffffff');
+        document.documentElement.style.setProperty('--border-color', '#d0d7de');
+        document.documentElement.style.setProperty('--text-color', '#24292f');
+        document.documentElement.style.setProperty('--text-muted', '#57606a');
+    } else {
+        document.documentElement.style.setProperty('--background-primary', '#0d1117');
+        document.documentElement.style.setProperty('--background-secondary', '#161b22');
+        document.documentElement.style.setProperty('--card-bg', '#1c2333');
+        document.documentElement.style.setProperty('--border-color', '#30363d');
+        document.documentElement.style.setProperty('--text-color', '#e6edf3');
+        document.documentElement.style.setProperty('--text-muted', '#8b949e');
     }
+}
+
+function clearAllData() {
+    if (!confirm(' This will permanently delete all logs and data. Continue?')) return;
+    if (!confirm(' Are you absolutely sure? This action cannot be undone!')) return;
     
-    function initRangeDisplays() {
-        const ranges = document.querySelectorAll('input[type="range"]');
-        ranges.forEach(range => {
-            const display = range.parentElement.querySelector('.range-display');
-            if (display) {
-                range.addEventListener('input', function() {
-                    const value = this.value;
-                    const suffix = this.id.includes('Interval') ? 'ms' : 
-                                  this.id.includes('Timeout') ? 's' : 
-                                  this.id.includes('Limit') && !this.id.includes('Memory') ? '%' : 
-                                  this.id.includes('Memory') ? 'MB' : '';
-                    display.textContent = value + suffix;
-                });
-            }
-        });
-    }
-    
-    function initSearch() {
-        const searchInput = document.getElementById('settings-search-input');
-        if (!searchInput) return;
-        
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            const settingsPanels = document.querySelectorAll('.settings-panel');
-            const settingItems = document.querySelectorAll('.setting-item');
-            
-            if (!query) {
-                // Show all
-                settingItems.forEach(item => item.style.display = '');
-                settingsPanels.forEach(panel => panel.style.display = '');
-                // Restore active tab visibility
-                document.querySelectorAll('.tab-btn').forEach(tab => {
-                    const panelId = tab.dataset.tab;
-                    const panel = document.getElementById('panel-' + panelId);
-                    if (panel) {
-                        panel.style.display = tab.classList.contains('active') ? 'block' : 'none';
-                    }
-                });
-                return;
-            }
-            
-            // Search through settings
-            let foundInPanel = {};
-            settingItems.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                const matches = text.includes(query);
-                item.style.display = matches ? '' : 'none';
-                
-                // Track which panels have matches
-                const panel = item.closest('.settings-panel');
-                if (panel && matches) {
-                    const panelId = panel.id.replace('panel-', '');
-                    foundInPanel[panelId] = true;
-                }
-            });
-            
-            // Show panels with matches
-            settingsPanels.forEach(panel => {
-                const panelId = panel.id.replace('panel-', '');
-                if (foundInPanel[panelId]) {
-                    panel.style.display = 'block';
-                    // Activate corresponding tab
-                    document.querySelectorAll('.tab-btn').forEach(tab => {
-                        if (tab.dataset.tab === panelId) {
-                            tab.classList.add('active');
-                        } else {
-                            tab.classList.remove('active');
-                        }
-                    });
-                } else {
-                    panel.style.display = 'none';
-                }
-            });
-        });
-    }
-    
-    function setupEventListeners() {
-        // Save button
-        document.getElementById('save-settings-btn')?.addEventListener('click', function() {
-            if (window.settingsManager) {
-                window.settingsManager.saveSettings();
-                document.getElementById('unsaved-indicator').style.display = 'none';
-            }
-        });
-        
-        // Reset button
-        document.getElementById('reset-settings-btn')?.addEventListener('click', function() {
-            if (window.settingsManager) {
-                window.settingsManager.resetToDefaults();
-                document.getElementById('unsaved-indicator').style.display = 'none';
-            }
-        });
-        
-        // Export button
-        document.getElementById('export-settings-btn')?.addEventListener('click', function() {
-            if (window.settingsManager) {
-                window.settingsManager.exportSettings();
-            }
-        });
-        
-        // Import button
-        document.getElementById('import-settings-btn')?.addEventListener('click', function() {
-            document.getElementById('import-settings-file')?.click();
-        });
-        
-        // Import file
-        document.getElementById('import-settings-file')?.addEventListener('change', function(e) {
-            if (window.settingsManager && this.files[0]) {
-                window.settingsManager.importSettings(this.files[0]);
-            }
-        });
-        
-        // Track changes for unsaved indicator
-        document.querySelectorAll('[data-setting]').forEach(element => {
-            element.addEventListener('change', function() {
-                document.getElementById('unsaved-indicator').style.display = 'inline';
-                showStatusBar(' Settings changed. Click "Save Settings" to apply.', 'warning');
-            });
-            element.addEventListener('input', function() {
-                document.getElementById('unsaved-indicator').style.display = 'inline';
-            });
-        });
-    }
-    
-    function showStatusBar(message, type = 'info') {
-        const bar = document.getElementById('settings-status-bar');
-        const msg = document.getElementById('status-message');
-        if (bar && msg) {
-            msg.innerHTML = `<i class="fas fa-${type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i> ${message}`;
-            bar.style.display = 'flex';
-            bar.style.borderTop = type === 'warning' ? '2px solid var(--warning-color)' : '1px solid var(--border-color)';
-            
-            // Auto-hide after 10 seconds
-            clearTimeout(window.statusBarTimeout);
-            window.statusBarTimeout = setTimeout(() => {
-                bar.style.display = 'none';
-            }, 10000);
-        }
-    }
-    
-    function dismissStatusBar() {
-        const bar = document.getElementById('settings-status-bar');
-        if (bar) {
-            bar.style.display = 'none';
-        }
-    }
-    
-    // ============================================================================
-    // EXTERNAL FUNCTIONS
-    // ============================================================================
-    
-    function changePassword() {
-        // Password change modal
-        const currentPassword = prompt('Enter current password:');
-        if (!currentPassword) return;
-        
-        const newPassword = prompt('Enter new password:');
-        if (!newPassword) return;
-        
-        const confirmPassword = prompt('Confirm new password:');
-        if (newPassword !== confirmPassword) {
-            alert(' Passwords do not match!');
-            return;
-        }
-        
-        // Send to server
-        fetch('/api/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                current: currentPassword,
-                new: newPassword
-            })
-        })
-        .then(response => response.json())
+    fetch('/api/clear-all-data', { method: 'POST' })
+        .then(r => r.json())
         .then(data => {
             if (data.success) {
-                alert(' Password changed successfully!');
-            } else {
-                alert(' Failed to change password: ' + data.message);
+                alert(' All data cleared successfully!');
+                location.reload();
             }
-        })
-        .catch(error => {
-            alert(' Error: ' + error.message);
         });
-    }
+}
+
+function resetApp() {
+    if (!confirm(' This will reset all settings and data to factory defaults. Continue?')) return;
+    if (!confirm(' Are you absolutely sure? This action cannot be undone!')) return;
     
-    function clearAllData() {
-        if (!confirm(' This will permanently delete all logs and data. Continue?')) return;
-        if (!confirm(' Are you absolutely sure? This action cannot be undone!')) return;
-        
-        fetch('/api/clear-all-data', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(' All data cleared successfully!');
-                    location.reload();
-                } else {
-                    alert(' Failed to clear data: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert(' Error: ' + error.message);
-            });
-    }
-    
-    function resetApplication() {
-        if (!confirm(' This will reset all settings and data to factory defaults. Continue?')) return;
-        if (!confirm(' Are you absolutely sure? This action cannot be undone!')) return;
-        
-        fetch('/api/reset-application', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(' Application reset successfully!');
-                    location.reload();
-                } else {
-                    alert(' Failed to reset: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert(' Error: ' + error.message);
-            });
-    }
-    
-    // ============================================================================
-    // EXPOSE FUNCTIONS GLOBALLY
-    // ============================================================================
-    
-    window.changePassword = changePassword;
-    window.clearAllData = clearAllData;
-    window.resetApplication = resetApplication;
-    window.dismissStatusBar = dismissStatusBar;
-    window.showStatusBar = showStatusBar;
-    
-    console.log('⚙️ Settings page loaded successfully!');
+    fetch('/api/reset-application', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert(' Application reset successfully!');
+                location.reload();
+            }
+        });
+}
 </script>
 {% endblock %}
